@@ -1,0 +1,193 @@
+[project]
+name = "challange-1-book-search"
+version = "0.1.0"
+description = ""
+authors = [
+    { name = "Sóstenes Souza", email = "sostenes198br@hotmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi (>=0.116.2,<0.117.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "1.18.1"
+ruff = "0.13.0"
+black = "25.1.0"
+pytest = "8.4.2"
+poethepoet = "0.37.0"
+pytest-cov = "7.0.0"
+poetry-plugin-export = "1.9.0"
+pip-audit = "2.9.0"
+
+[tool.poetry]
+package-mode = false
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# -----------------------------
+# Black = "o Prettier do Python"
+# -----------------------------
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+skip-string-normalization = false
+preview = false
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------
+# Ruff = linter (E/F) + extras (UP/SIM/B/PL etc.)
+# Também cobre isort (organização de imports)
+# ----------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+#extend-exclude = ["infra", "docs"] # 👈 Ignora essas pastas
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle (estilo)
+    "F", # pyflakes (erros)
+    #  "I",   # isort (imports)
+    "UP", # pyupgrade (idiomático p/ versões recentes)
+    "B", # flake8-bugbear (armadilhas comuns)
+    "SIM", # flake8-simplify (simplificações)
+    "PL", # pylint (subset útil)
+]
+ignore = [
+    "E203", # compat Black (slice spacing)
+    "E266", # muitos '#'
+    #  "E501",  # comprimento de linha (Black cuida disso)
+]
+# Você pode “afrouxar” regras aqui se ficar muito rígido.
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-single-line = false
+known-first-party = ["challange-1-book-search"]   # ajuste para seu(s) pacote(s)
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------
+# mypy = checagem de tipos (Type Hints PEP)
+# -----------------------------------------
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "tests"]
+#exclude = '(^|/)(infra|docs)(/|$)'  # 👈 Ignora essas pastas
+warn_return_any = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+strict_optional = true
+pretty = true
+#ignore_missing_imports = true   # útil p/ libs sem stubs; pode remover se quiser rigor máximo
+
+# Opcional: excluir diretórios gerados
+#mypy_path = ["src", "tests"]
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------
+# pytest
+# -----------------------------------------
+[tool.pytest.ini_options]
+# Descobrir testes só em tests/
+testpaths = ["tests"]
+# Evitar descer em infra/ e docs/
+#norecursedirs = ["infra", "docs"]
+# Garante que o src/ entre no sys.path
+pythonpath = ["src"]
+markers = [
+    "unit: fast unit tests",
+    "integration: integration tests (may touch external services)",
+    "e2e: end-to-end tests (slow, full stack)",
+]
+#addopts = [
+#    "-ra",
+#    "--strict-markers",
+#    ["-m", "unit"]
+#]
+
+[tool.coverage.run]
+data_file = "coverage/.coverage"
+branch = true
+source = ["src"]
+
+# Se usa threads/processos ou pytest-xdist / subprocessos
+#parallel = true
+#concurrency = ["thread", "multiprocessing"]
+
+# (Opcional) contexto por teste — ótimo para diagnóstico fino
+#dynamic_context = "test_function"
+
+# Inclua/omita conforme seu repo
+# include = ["src/**/*.py"]
+omit = [
+    "tests/*",
+    "infra/*",
+    "docs/*",
+    "*/migrations/*",
+    "*/.venv/*",
+    "*/venv/*",
+    #    "*/__main__.py", # se não quer medir entrypoints CLIs
+]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2 # casas decimais no percentual (só estética, mas ajuda).
+#skip_covered = true # esconde arquivos 100% cobertos (relatório menor).
+#fail_under = 80  # opcional: quebra build se <80%
+
+# Linhas que o coverage deve ignorar (padrões comuns)
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+    #  "raise NotImplementedError",
+]
+
+[tool.coverage.html]
+directory = "coverage/cov_html"
+
+[tool.coverage.xml]
+output = "coverage/coverage_xml"
+
+# (Opcional) se quiser JSON:
+# [tool.coverage.json]
+# output = "coverage/coverage_json"
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# -----------------------------------------
+# Tasks com Poe the Poet
+# -----------------------------------------
+[tool.poe.tasks]
+audit = { sequence = [
+    { cmd = "python -c \"import pathlib; pathlib.Path('requirements.txt').unlink(missing_ok=True)\"" },
+    { cmd = "poetry check" },
+    { cmd = "poetry export -f requirements.txt --without-hashes -o requirements.txt" },
+    { cmd = "pip-audit -r requirements.txt --strict"}
+] }
+clean_coverage = { cmd = "python -c \"import shutil, pathlib; p=pathlib.Path('coverage'); shutil.rmtree(p, ignore_errors=True)\"" }
+fmt = { cmd = "black src tests" }
+lint = { cmd = "ruff check --verbose" }
+typecheck = { cmd = "mypy" }
+test_unit = { sequence = ["clean_coverage", { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=html" }] }
+test_integration = { cmd = "pytest -m integration" }
+test_e2e = { cmd = "pytest -m e2e" }
+pre_commit = { sequence = ["fmt", "lint", "typecheck"] }
