@@ -1,4 +1,4 @@
-from src.infrastructure import Abstract
+from src.standard.built_in.Abstract import Abstract
 
 
 class UseCaseInput(Abstract):
