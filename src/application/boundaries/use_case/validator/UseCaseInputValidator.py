@@ -3,9 +3,9 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Generic, TypeVar
 
-from src.standard import Abstract
-from .input.UseCaseInput import UseCaseInput
-from .validator.UseCaseInputNotificationErrors import UseCaseInputNotificationErrors
+from src.standard.built_in.Abstract import Abstract
+from src.application.boundaries.use_case.input.UseCaseInput import UseCaseInput
+from src.application.boundaries.use_case.validator.UseCaseInputNotificationErrors import UseCaseInputNotificationErrors
 
 TInput = TypeVar("TInput", bound=UseCaseInput)
 
