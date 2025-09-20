@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from typing import Dict, List, Self
 
 
-@dataclass
 class UseCaseInputNotificationErrors:
 
     def __init__(self) -> None:
-        self._error_messages: Dict[str, List[str]] = field(default_factory=dict, init=False)
-        self._has_errors: bool = field(default=False, init=False)
+        self._error_messages: Dict[str, List[str]] = {}
+        self._has_errors: bool = False
 
     @property
     def has_errors(self) -> bool:

@@ -25,6 +25,8 @@ poethepoet = "0.37.0"
 pytest-cov = "7.0.0"
 poetry-plugin-export = "1.9.0"
 pip-audit = "2.9.0"
+pytest-asyncio = "^1.2.0"
+pytest-mock = "^3.15.1"
 
 [tool.poetry]
 package-mode = false
@@ -111,17 +113,17 @@ testpaths = ["tests"]
 # Evitar descer em infra/ e docs/
 #norecursedirs = ["infra", "docs"]
 # Garante que o src/ entre no sys.path
+asyncio_mode = "auto"   # faz o pytest detectar testes async automaticamente
 pythonpath = ["src"]
 markers = [
     "unit: fast unit tests",
     "integration: integration tests (may touch external services)",
     "e2e: end-to-end tests (slow, full stack)",
 ]
-#addopts = [
-#    "-ra",
-#    "--strict-markers",
-#    ["-m", "unit"]
-#]
+addopts = [
+    "-ra",
+    "--strict-markers",
+]
 
 [tool.coverage.run]
 data_file = "coverage/.coverage"
@@ -138,13 +140,16 @@ source = ["src"]
 # Inclua/omita conforme seu repo
 # include = ["src/**/*.py"]
 omit = [
+    "src/Main.py",
     "tests/*",
     "infra/*",
     "docs/*",
     "*/migrations/*",
     "*/.venv/*",
     "*/venv/*",
-    #    "*/__main__.py", # se não quer medir entrypoints CLIs
+    "*/__init__.py",
+    "*/__main__.py", # se não quer medir entrypoints CLIs
+
 ]
 
 [tool.coverage.report]
@@ -158,6 +163,8 @@ exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
+    "@abstractmethod",
+    "Abstract"
     #  "raise NotImplementedError",
 ]
 
@@ -181,13 +188,13 @@ audit = { sequence = [
     { cmd = "python -c \"import pathlib; pathlib.Path('requirements.txt').unlink(missing_ok=True)\"" },
     { cmd = "poetry check" },
     { cmd = "poetry export -f requirements.txt --without-hashes -o requirements.txt" },
-    { cmd = "pip-audit -r requirements.txt --strict"}
+    { cmd = "pip-audit -r requirements.txt --strict" }
 ] }
 clean_coverage = { cmd = "python -c \"import shutil, pathlib; p=pathlib.Path('coverage'); shutil.rmtree(p, ignore_errors=True)\"" }
 fmt = { cmd = "black src tests" }
 lint = { cmd = "ruff check --verbose" }
 typecheck = { cmd = "mypy" }
-test_unit = { sequence = ["clean_coverage", { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=html" }] }
+test_unit = { sequence = ["clean_coverage", { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=html --cov-report=term-missing" }] }
 test_integration = { cmd = "pytest -m integration" }
 test_e2e = { cmd = "pytest -m e2e" }
 pre_commit = { sequence = ["fmt", "lint", "typecheck"] }

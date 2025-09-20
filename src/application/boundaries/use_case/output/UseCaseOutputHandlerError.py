@@ -1,9 +1,9 @@
 from abc import abstractmethod
 
-from .UseCaseOutput import UseCaseOutput
+from .UseCaseOutputHandler import UseCaseOutputHandler
 
 
-class UseCaseOutputHandler(UseCaseOutput):
+class UseCaseOutputHandlerHandlerError(UseCaseOutputHandler):
     @abstractmethod
     async def handler_error_async(self, error: Exception) -> None:
         pass
