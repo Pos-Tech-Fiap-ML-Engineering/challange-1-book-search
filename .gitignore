@@ -36,10 +36,6 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
- # Requirements.txt Temps
- ./requirements-all.txt
- ./requirements-dev.txt
-
 # Unit test / coverage reports
 coverage/
 htmlcov/
@@ -210,3 +206,4 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+/requirements-all.txt
