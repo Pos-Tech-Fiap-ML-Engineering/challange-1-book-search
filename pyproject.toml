@@ -184,11 +184,14 @@ output = "coverage/coverage_xml"
 # Tasks com Poe the Poet
 # -----------------------------------------
 [tool.poe.tasks]
+export_requirements_prod = { cmd = "poetry export -f requirements.txt --without-hashes -o requirements.txt" }
+export_requirements_all = { cmd = "poetry export -f requirements.txt --without-hashes --with dev -o requirements-all.txt" }
+export_requirements_dev = { cmd = "poetry export -f requirements.txt --without-hashes --only dev -o requirements-dev.txt" }
 audit = { sequence = [
-    { cmd = "python -c \"import pathlib; pathlib.Path('requirements.txt').unlink(missing_ok=True)\"" },
+    { cmd = "python -c \"import pathlib; pathlib.Path('requirements-all.txt').unlink(missing_ok=True)\"" },
     { cmd = "poetry check" },
-    { cmd = "poetry export -f requirements.txt --without-hashes -o requirements.txt" },
-    { cmd = "pip-audit -r requirements.txt --strict" }
+    "export_requirements_all",
+    { cmd = "pip-audit -r requirements-all.txt --strict" }
 ] }
 clean_coverage = { cmd = "python -c \"import shutil, pathlib; p=pathlib.Path('coverage'); shutil.rmtree(p, ignore_errors=True)\"" }
 fmt = { cmd = "black src tests" }
