@@ -187,6 +187,11 @@ output = "coverage/coverage_xml"
 export_requirements_prod = { cmd = "poetry export -f requirements.txt --without-hashes -o requirements.txt" }
 export_requirements_all = { cmd = "poetry export -f requirements.txt --without-hashes --with dev -o requirements-all.txt" }
 export_requirements_dev = { cmd = "poetry export -f requirements.txt --without-hashes --only dev -o requirements-dev.txt" }
+export_all_requirements = { sequence = [
+    "export_requirements_prod",
+    "export_requirements_all",
+    "export_requirements_dev",
+]}
 audit = { sequence = [
     { cmd = "python -c \"import pathlib; pathlib.Path('requirements-all.txt').unlink(missing_ok=True)\"" },
     { cmd = "poetry check" },
