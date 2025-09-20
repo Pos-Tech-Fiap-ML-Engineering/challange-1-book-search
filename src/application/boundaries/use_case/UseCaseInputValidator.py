@@ -11,6 +11,12 @@ TInput = TypeVar("TInput", bound=UseCaseInput)
 
 
 class UseCaseInputValidator(Abstract, Generic[TInput]):
+
+    async def validate_async(self, use_case_input: TInput) -> UseCaseInputNotificationErrors:
+        errors = UseCaseInputNotificationErrors.empty()
+        await self.impl_validate_async(use_case_input, errors)
+        return errors
+
     @abstractmethod
-    async def validate_async(self, use_case_input: TInput, errors: UseCaseInputNotificationErrors, ) -> None:
+    async def impl_validate_async(self, use_case_input: TInput, errors: UseCaseInputNotificationErrors, ) -> None:
         pass
