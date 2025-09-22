@@ -1,7 +1,8 @@
+from src.standard.built_in.Abstract import Abstract
 from src.standard.error.ApplicationErrorInfo import ApplicationErrorInfo
 
 
-class ApplicationError(Exception):
+class ApplicationError(Abstract, Exception):
 
     def __init__(self, error_info: ApplicationErrorInfo):
         self._error_info = error_info

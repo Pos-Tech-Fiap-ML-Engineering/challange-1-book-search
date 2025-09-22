@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, ABCMeta
-from typing import Any, cast, Self
+from typing import Any
 
 
 class _AbstractMeta(ABCMeta):
@@ -28,5 +28,5 @@ class _AbstractMeta(ABCMeta):
         return super().__call__(*args, **kwargs)
 
 
-class Abstract(metaclass=_AbstractMeta):
+class Abstract(ABC, metaclass=_AbstractMeta):
     __is_abstract_root__ = True
