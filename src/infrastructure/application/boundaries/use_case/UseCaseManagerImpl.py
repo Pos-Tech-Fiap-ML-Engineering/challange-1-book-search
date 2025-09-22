@@ -4,8 +4,8 @@ from src.application.boundaries.use_case.UseCase import UseCase
 from src.application.boundaries.use_case.UseCaseManager import UseCaseManager
 from src.application.boundaries.use_case.input.UseCaseInput import UseCaseInput
 from src.application.boundaries.use_case.output.UseCaseOutputHandler import UseCaseOutputHandler
-from src.application.boundaries.use_case.output.UseCaseOutputHandlerError import UseCaseOutputHandlerHandlerError
-from src.application.boundaries.use_case.output.UseCaseOutputInvalidInput import UseCaseOutputHandlerInvalidInput
+from src.application.boundaries.use_case.output.UseCaseOutputHandlerHandlerError import UseCaseOutputHandlerHandlerError
+from src.application.boundaries.use_case.output.UseCaseOutputHandlerInvalidInput import UseCaseOutputHandlerInvalidInput
 from src.application.boundaries.use_case.UseCaseInputValidator import UseCaseInputValidator
 from src.standard.app_log.AppLogger import AppLogger
 from src.standard.error.errors.ErrorStandardUseCaseNotFound import ErrorStandardUseCaseNotFound
@@ -58,9 +58,7 @@ class UseCaseManagerImpl(UseCaseManager):
         if not errors.has_errors:
             return False
 
-        flat_errors: Dict[str, str] = {f"{key}_{i}": v
-                                       for key, values in errors.errors.items()
-                                       for i, v in enumerate(values, start=1)}
+        flat_errors: Dict[str, str] = errors.flatten_errors
 
         self._logger.error(f"Invalid input {type(use_case_input).__name__}", extra=flat_errors)
 

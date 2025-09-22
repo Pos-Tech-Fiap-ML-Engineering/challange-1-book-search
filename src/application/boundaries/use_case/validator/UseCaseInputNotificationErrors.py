@@ -17,6 +17,13 @@ class UseCaseInputNotificationErrors:
     def errors(self) -> Dict[str, List[str]]:
         return self._error_messages.copy()
 
+    @property
+    def flatten_errors(self) -> Dict[str, str]:
+        errors = self.errors
+        return {f"{key}_{i}": v
+                for key, values in errors.items()
+                for i, v in enumerate(values, start=1)}
+
     def add(self, key: str, message: str) -> None:
         self._has_errors = True
         self._error_messages.setdefault(key, []).append(message)
