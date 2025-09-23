@@ -7,6 +7,7 @@ from src.standard.built_in.Abstract import Abstract
 
 
 class AppLogger(Abstract):
+
     @abstractmethod
     def debug(self, message: str, extra: Optional[Dict[str, str]] = None) -> None:
         pass
