@@ -4,7 +4,7 @@ from src.standard.built_in.Abstract import Abstract
 
 
 class BaseController(Abstract):
-    _router: APIRouter = APIRouter()
+    _router: APIRouter
 
     def get_router(self) -> APIRouter:
         return self._router

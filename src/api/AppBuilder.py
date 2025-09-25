@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 
 import logging
 
@@ -19,11 +19,13 @@ class AppBuilder:
     _app_logger: AppLogger
     _use_caser_manager: UseCaseManager
     _controllers: Dict[str, List[BaseController]]
+    _fast_api: FastAPI
 
     def __init__(self) -> None:
         self._app_logger = self._load_app_logger()
         self._use_caser_manager = self._load_use_caser_manager()
         self._controllers = self._load_controllers()
+        self._fast_api = self._load_fast_api_server()
 
     def _load_app_logger(self) -> AppLogger:
         logger = logging.getLogger("app")
@@ -43,7 +45,7 @@ class AppBuilder:
             ]
         }
 
-    def build_fast_api_server(self) -> FastAPI:
+    def _load_fast_api_server(self) -> FastAPI:
         app = FastAPI(
             title="Book Search",
             version="1.0.0",
@@ -53,8 +55,25 @@ class AppBuilder:
         )
 
         routers = Router.get_router(
+            base_router=APIRouter(),
             v1_controllers=self._controllers[V1_CONTROLLERS],
         )
         app.include_router(routers)
 
         return app
+
+    @property
+    def app_logger(self) -> AppLogger:
+        return self._app_logger
+
+    @property
+    def use_caser_manager(self) -> UseCaseManager:
+        return self._use_caser_manager
+
+    @property
+    def controllers(self) -> Dict[str, List[BaseController]]:
+        return self._controllers
+
+    @property
+    def fast_api(self) -> FastAPI:
+        return self._fast_api

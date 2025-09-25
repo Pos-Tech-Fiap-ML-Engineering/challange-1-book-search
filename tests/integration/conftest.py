@@ -44,7 +44,7 @@ def bootstrap(request: FixtureRequest, worker_id: str) -> dict[str, str]:
     data: dict[str, str] = {}
     worker_count: int = int(os.environ.get("PYTEST_XDIST_WORKER_COUNT", "1"))
 
-    print(f"[PRINT] pid={os.getpid()} worker={worker_id}", file=sys.stderr, flush=True)
+    # print(f"[PRINT] pid={os.getpid()} worker={worker_id}", file=sys.stderr, flush=True)
 
     with FileLock(LOCK_FILE_PATH, timeout=60):
         data = _safe_read_json(STATE_TEST_FILE_PATH)
@@ -65,9 +65,7 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
         state_workers = _safe_read_json(STATE_WORKERS_FILE_PATH)
         state_workers[bootstrapped_workers_env] = cast(int, state_workers.get(bootstrapped_workers_env)) + 1
         _safe_write_json(STATE_WORKERS_FILE_PATH, state_workers)
-        print(
-            f"[PRINT] current workers {state_workers[bootstrapped_workers_env]} quantity workers {state_workers[bootstrapped_workers_count_env]}",
-            file=sys.stderr, flush=True)
+
         if state_workers[bootstrapped_workers_env] == state_workers[bootstrapped_workers_count_env]:
             _session_teardown(session.config)
             _cleanup_files()
@@ -95,7 +93,7 @@ async def app_builder() -> AsyncIterator[AppBuilder]:
 
 @pytest.fixture(scope="function")
 async def fast_api(app_builder: AppBuilder) -> AsyncIterator[FastAPI]:
-    yield app_builder.build_fast_api_server()
+    yield app_builder._load_fast_api_server()
 
 
 @pytest.fixture(scope="function")
