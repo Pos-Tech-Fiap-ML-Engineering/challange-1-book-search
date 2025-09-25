@@ -9,7 +9,7 @@ class HealthController(BaseController):
 
     def __init__(self) -> None:
         self._router.add_api_route(
-            path="/",
+            path="",
             endpoint=self.get_health_async,
             methods=["GET"],
             response_model=HealthCheckOutput,

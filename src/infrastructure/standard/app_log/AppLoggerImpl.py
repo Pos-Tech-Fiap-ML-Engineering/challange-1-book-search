@@ -20,7 +20,7 @@ class _LogEntry:
 
 class AppLoggerImpl(AppLogger):
 
-    def __init__(self, *, logger: Logger) -> None:
+    def __init__(self, logger: Logger) -> None:
         self._logger_manager: contextvars.ContextVar[_LogEntry] = (
             contextvars.ContextVar(AppLoggerImpl.__name__, default=_LogEntry(logger=logger))
         )

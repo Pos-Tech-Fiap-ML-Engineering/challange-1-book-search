@@ -28,6 +28,10 @@ poetry-plugin-export = "1.9.0"
 pip-audit = "2.9.0"
 pytest-asyncio = "^1.2.0"
 pytest-mock = "^3.15.1"
+pytest-xdist = "^3.8.0"
+asgi-lifespan = "^2.1.0"
+filelock = "^3.19.1"
+pydevd-pycharm = "^253.20558.58"
 
 [tool.poetry]
 package-mode = false
@@ -125,6 +129,8 @@ addopts = [
     "-ra",
     "--strict-markers",
 ]
+#log_cli = true
+#log_cli_level = "INFO"
 
 [tool.coverage.run]
 data_file = "coverage/.coverage"
@@ -193,7 +199,7 @@ export_all_requirements = { sequence = [
     "export_requirements_prod",
     "export_requirements_all",
     "export_requirements_dev",
-]}
+] }
 audit = { sequence = [
     { cmd = "python -c \"import pathlib; pathlib.Path('requirements-all.txt').unlink(missing_ok=True)\"" },
     { cmd = "poetry check" },
@@ -204,7 +210,9 @@ clean_coverage = { cmd = "python -c \"import shutil, pathlib; p=pathlib.Path('co
 fmt = { cmd = "black src tests" }
 lint = { cmd = "ruff check --verbose" }
 typecheck = { cmd = "mypy" }
-test_unit = { sequence = ["clean_coverage", { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=html --cov-report=term-missing" }] }
-test_integration = { cmd = "pytest -m integration" }
-test_e2e = { cmd = "pytest -m e2e" }
+test_unit = { sequence = [
+    "clean_coverage",
+    { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=html --cov-report=term-missing -n auto --dist loadfile" }]}
+test_integration = { cmd = "pytest -m integration -n auto -s --dist loadfile" }
+test_e2e = { cmd = "pytest -m e2e -n auto --dist loadfile" }
 pre_commit = { sequence = ["fmt", "lint", "typecheck"] }
