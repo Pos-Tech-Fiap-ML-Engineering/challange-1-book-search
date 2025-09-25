@@ -15,7 +15,7 @@ from src.standard.error.errors.ErrorStandardUseCaseOutputNotHandlerInvalidInput 
 
 class UseCaseManagerImpl(UseCaseManager):
 
-    def __init__(self, *, logger: AppLogger, use_cases: List[UseCase]) -> None:
+    def __init__(self, logger: AppLogger, use_cases: List[UseCase]) -> None:
         self._logger: AppLogger = logger
         self._use_cases: Dict[Tuple[Type[UseCaseInput], Type[UseCaseOutputHandler]], UseCase] = {
             (uc.input_type, uc.output_type): uc
