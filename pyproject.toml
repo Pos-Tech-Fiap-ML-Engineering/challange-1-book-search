@@ -147,7 +147,7 @@ source = ["src"]
 # Inclua/omita conforme seu repo
 # include = ["src/**/*.py"]
 omit = [
-    "src/Main.py",
+    "src/api/Main.py",
     "tests/*",
     "infra/*",
     "docs/*",
@@ -212,7 +212,7 @@ lint = { cmd = "ruff check --verbose" }
 typecheck = { cmd = "mypy" }
 test_unit = { sequence = [
     "clean_coverage",
-    { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=html --cov-report=term-missing -n auto --dist loadfile" }]}
+    { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -n auto --dist loadfile" }]}
 test_integration = { cmd = "pytest -m integration -n auto -s --dist loadfile" }
 test_e2e = { cmd = "pytest -m e2e -n auto --dist loadfile" }
 pre_commit = { sequence = ["fmt", "lint", "typecheck"] }
