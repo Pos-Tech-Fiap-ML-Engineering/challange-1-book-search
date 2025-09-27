@@ -9,13 +9,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi (>=0.116.2,<0.117.0)",
-    "uvicorn (>=0.36.0,<0.37.0)"
 ]
-
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.18.1"
@@ -32,6 +26,13 @@ pytest-xdist = "^3.8.0"
 asgi-lifespan = "^2.1.0"
 filelock = "^3.19.1"
 pydevd-pycharm = "^253.20558.58"
+deptry = "^0.23.1"
+uvicorn = {extras = ["standart"], version = "0.37.0"}
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 package-mode = false
@@ -42,13 +43,14 @@ package-mode = false
 # Black = "o Prettier do Python"
 # -----------------------------
 
+
 [tool.black]
 line-length = 100
 target-version = ["py312"]
 skip-string-normalization = false
 preview = false
 
-# ----------------------------------------------------------------------------------------------------------------------
+
 
 # ----------------------------------------------
 # Ruff = linter (E/F) + extras (UP/SIM/B/PL etc.)
@@ -83,7 +85,7 @@ force-single-line = false
 known-first-party = ["challange-1-book-search"]   # ajuste para seu(s) pacote(s)
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
-# ----------------------------------------------------------------------------------------------------------------------
+
 
 # -----------------------------------------
 # mypy = checagem de tipos (Type Hints PEP)
@@ -107,7 +109,20 @@ pretty = true
 #mypy_path = ["src", "tests"]
 
 
-# ----------------------------------------------------------------------------------------------------------------------
+
+
+# -----------------------------------------
+# deptry
+# -----------------------------------------
+
+#[tool.deptry]
+#ignore = ["DEP002", "DEP003"] # Você pode desligar a regra toda
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["uvicorn"]   # ignorar "unused dependency" só para uvicorn
+DEP003 = ["pydantic"]  # ignorar "transitive dependency" só para pydantic
+
+
 
 # -----------------------------------------
 # pytest
@@ -186,7 +201,7 @@ output = "coverage/coverage_xml"
 # [tool.coverage.json]
 # output = "coverage/coverage_json"
 
-# ----------------------------------------------------------------------------------------------------------------------
+
 
 # -----------------------------------------
 # Tasks com Poe the Poet
@@ -204,15 +219,17 @@ audit = { sequence = [
     { cmd = "python -c \"import pathlib; pathlib.Path('requirements-all.txt').unlink(missing_ok=True)\"" },
     { cmd = "poetry check" },
     "export_requirements_all",
-    { cmd = "pip-audit -r requirements-all.txt --strict" }
+    { cmd = "pip-audit -r requirements-all.txt --strict" },
+    "check_dependencies"
 ] }
 clean_coverage = { cmd = "python -c \"import shutil, pathlib; p=pathlib.Path('coverage'); shutil.rmtree(p, ignore_errors=True)\"" }
 fmt = { cmd = "black src tests" }
 lint = { cmd = "ruff check --verbose" }
 typecheck = { cmd = "mypy" }
+check_dependencies = { cmd = "deptry ." }
 test_unit = { sequence = [
     "clean_coverage",
-    { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -n auto --dist loadfile" }]}
+    { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -n auto --dist loadfile" }] }
 test_integration = { cmd = "pytest -m integration -n auto -s --dist loadfile" }
 test_e2e = { cmd = "pytest -m e2e -n auto --dist loadfile" }
 pre_commit = { sequence = ["fmt", "lint", "typecheck"] }

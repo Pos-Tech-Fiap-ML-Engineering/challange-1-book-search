@@ -1,0 +1,59 @@
+# =========================
+# Build stage (mesmo da API)
+# =========================
+FROM python:3.12-slim AS builder
+
+ENV POETRY_VERSION=1.8.3 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir "poetry==$POETRY_VERSION"
+
+WORKDIR /app
+COPY pyproject.toml poetry.lock ./
+RUN poetry config virtualenvs.create false \
+ && poetry install --without dev --no-interaction --no-ansi
+
+COPY src ./src
+
+# =========================
+# Runtime Celery
+# =========================
+FROM python:3.12-slim AS runtime
+
+ENV PYTHONUNBUFFERED=1 TZ=America/Sao_Paulo
+
+RUN useradd -m celeryuser
+USER celeryuser
+WORKDIR /app
+
+COPY --from=builder /app /app
+
+# Instala celery no runtime
+USER root
+RUN pip install --no-cache-dir "celery[redis]==5.4.0"
+USER celeryuser
+
+# CMD dinâmico (workers ≈ CPUs)
+ENV MAX_WORKERS=4
+CMD /bin/sh -c '\
+  detect_cpus() { \
+    if [ -f /sys/fs/cgroup/cpu.max ]; then \
+      read Q P < /sys/fs/cgroup/cpu.max; \
+      [ "$Q" = "max" ] && nproc || awk -v q=$Q -v p=$P "BEGIN{print int((q+p-1)/p)}"; \
+    else \
+      Q=$(cat /sys/fs/cgroup/cpu/cpu.cfs_quota_us 2>/dev/null || echo -1); \
+      P=$(cat /sys/fs/cgroup/cpu/cpu.cfs_period_us 2>/dev/null || echo -1); \
+      [ $Q -gt 0 -a $P -gt 0 ] && awk -v q=$Q -v p=$P "BEGIN{print int((q+p-1)/p)}" || nproc; \
+    fi; \
+  }; \
+  CPUS=$(detect_cpus); [ "$CPUS" -lt 1 ] && CPUS=1; \
+  W=${WEB_CONCURRENCY:-$CPUS}; \
+  [ "$MAX_WORKERS" -gt 0 ] && [ "$W" -gt "$MAX_WORKERS" ] && W=$MAX_WORKERS; \
+  exec celery -A src.worker.celery_app worker \
+    --loglevel=INFO --concurrency="$W" --max-tasks-per-child=500 \
+'
