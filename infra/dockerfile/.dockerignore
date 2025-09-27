@@ -1,0 +1,14 @@
+.git/
+.idea/
+__pycache__/
+docs/
+coverage/
+infra/
+tests/
+.gitignore
+README*.md
+requirements*.txt
+*.pyc
+.venv
+.poetry
+
