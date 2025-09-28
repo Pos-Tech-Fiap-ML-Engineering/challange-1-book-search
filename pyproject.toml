@@ -27,7 +27,7 @@ asgi-lifespan = "^2.1.0"
 filelock = "^3.19.1"
 pydevd-pycharm = "^253.20558.58"
 deptry = "^0.23.1"
-uvicorn = {extras = ["standart"], version = "0.37.0"}
+uvicorn = { extras = ["standart"], version = "0.37.0" }
 
 
 [build-system]
@@ -57,7 +57,7 @@ preview = false
 # Também cobre isort (organização de imports)
 # ----------------------------------------------
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py312"
 src = ["src", "tests"]
 #extend-exclude = ["infra", "docs"] # 👈 Ignora essas pastas
@@ -75,9 +75,21 @@ select = [
 ignore = [
     "E203", # compat Black (slice spacing)
     "E266", # muitos '#'
-    #  "E501",  # comprimento de linha (Black cuida disso)
+    #  "E501",  # comprimento de linha (Black cuida disso),
+    "PLR2004",
+    "B010"
 ]
 # Você pode “afrouxar” regras aqui se ficar muito rígido.
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "PLR2004",
+    "PLR0915",
+    "PLR0913",
+    "PLR0912",
+    "E501",
+    "B017"
+]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -215,21 +227,27 @@ export_all_requirements = { sequence = [
     "export_requirements_all",
     "export_requirements_dev",
 ] }
+clean_coverage = { cmd = "python -c \"import shutil, pathlib; p=pathlib.Path('coverage'); shutil.rmtree(p, ignore_errors=True)\"" }
+clean_all = { sequence = [
+    "clean_coverage"
+] }
+check_deep_dependencies = { cmd = "deptry ." }
 audit = { sequence = [
     { cmd = "python -c \"import pathlib; pathlib.Path('requirements-all.txt').unlink(missing_ok=True)\"" },
     { cmd = "poetry check" },
     "export_requirements_all",
     { cmd = "pip-audit -r requirements-all.txt --strict" },
-    "check_dependencies"
+    "check_deep_dependencies"
 ] }
-clean_coverage = { cmd = "python -c \"import shutil, pathlib; p=pathlib.Path('coverage'); shutil.rmtree(p, ignore_errors=True)\"" }
 fmt = { cmd = "black src tests" }
-lint = { cmd = "ruff check --verbose" }
+lint = { sequence = [ # --verbose with need more details
+    { cmd = "ruff check . --fix --select F401,UP006,E501,UP035,SIM118,UP045,UP046" },
+    { cmd = "ruff check" }
+] }
 typecheck = { cmd = "mypy" }
-check_dependencies = { cmd = "deptry ." }
 test_unit = { sequence = [
     "clean_coverage",
     { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -n auto --dist loadfile" }] }
 test_integration = { cmd = "pytest -m integration -n auto -s --dist loadfile" }
 test_e2e = { cmd = "pytest -m e2e -n auto --dist loadfile" }
-pre_commit = { sequence = ["fmt", "lint", "typecheck"] }
+pre_commit = { sequence = ["fmt", "lint", "typecheck", "audit"] }

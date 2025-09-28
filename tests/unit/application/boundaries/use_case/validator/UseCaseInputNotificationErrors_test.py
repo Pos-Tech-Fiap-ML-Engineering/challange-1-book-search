@@ -1,6 +1,8 @@
 import pytest
 
-from src.application.boundaries.use_case.validator.UseCaseInputNotificationErrors import UseCaseInputNotificationErrors
+from src.application.boundaries.use_case.validator.UseCaseInputNotificationErrors import (
+    UseCaseInputNotificationErrors,
+)
 
 
 class TestUseCaseInputNotificationErrors:
@@ -36,15 +38,29 @@ class TestUseCaseInputNotificationErrors:
         # assert
         assert self._use_case_input_notification_errors.has_errors is True
         assert len(self._use_case_input_notification_errors.errors) == 3
-        assert self._use_case_input_notification_errors.errors['prop1'] == ["ERROR_1", "ERROR_2", "ERROR_3"]
-        assert self._use_case_input_notification_errors.errors['prop2'] == ["ERROR_1", "ERROR_2", "ERROR_3"]
-        assert self._use_case_input_notification_errors.errors['prop3'] == ["ERROR_1", "ERROR_2", "ERROR_3"]
-        assert self._use_case_input_notification_errors.flatten_errors == {'prop1_1': 'ERROR_1',
-                                                                           'prop1_2': 'ERROR_2',
-                                                                           'prop1_3': 'ERROR_3',
-                                                                           'prop2_1': 'ERROR_1',
-                                                                           'prop2_2': 'ERROR_2',
-                                                                           'prop2_3': 'ERROR_3',
-                                                                           'prop3_1': 'ERROR_1',
-                                                                           'prop3_2': 'ERROR_2',
-                                                                           'prop3_3': 'ERROR_3'}
+        assert self._use_case_input_notification_errors.errors["prop1"] == [
+            "ERROR_1",
+            "ERROR_2",
+            "ERROR_3",
+        ]
+        assert self._use_case_input_notification_errors.errors["prop2"] == [
+            "ERROR_1",
+            "ERROR_2",
+            "ERROR_3",
+        ]
+        assert self._use_case_input_notification_errors.errors["prop3"] == [
+            "ERROR_1",
+            "ERROR_2",
+            "ERROR_3",
+        ]
+        assert self._use_case_input_notification_errors.flatten_errors == {
+            "prop1_1": "ERROR_1",
+            "prop1_2": "ERROR_2",
+            "prop1_3": "ERROR_3",
+            "prop2_1": "ERROR_1",
+            "prop2_2": "ERROR_2",
+            "prop2_3": "ERROR_3",
+            "prop3_1": "ERROR_1",
+            "prop3_2": "ERROR_2",
+            "prop3_3": "ERROR_3",
+        }

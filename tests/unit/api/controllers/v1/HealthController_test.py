@@ -1,4 +1,4 @@
-from typing import Iterator
+from collections.abc import Iterator
 
 import pytest
 
@@ -17,7 +17,7 @@ class TestHealthController:
 
     def test_router_path(self) -> None:
         # arrange - act - assert
-        assert getattr(self._controller, '_router') is not None
+        assert getattr(self._controller, "_router", None) is not None
 
     async def test_get_health_async(self) -> None:
         # arrange
