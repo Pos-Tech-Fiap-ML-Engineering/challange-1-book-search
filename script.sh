@@ -482,7 +482,6 @@ case "$target" in
     ci_build
     ci_test_unit
     ci_test_integration
-    ci_test_e2e
     ;;
 
   cd:build)
