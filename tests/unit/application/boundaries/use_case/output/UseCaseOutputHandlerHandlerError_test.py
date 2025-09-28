@@ -1,6 +1,8 @@
 import pytest
 
-from src.application.boundaries.use_case.output.UseCaseOutputHandlerHandlerError import UseCaseOutputHandlerHandlerError
+from src.application.boundaries.use_case.output.UseCaseOutputHandlerHandlerError import (
+    UseCaseOutputHandlerHandlerError,
+)
 from src.standard.built_in.Abstract import Abstract
 
 

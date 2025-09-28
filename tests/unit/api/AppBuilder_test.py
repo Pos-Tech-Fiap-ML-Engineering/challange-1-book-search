@@ -1,4 +1,4 @@
-from typing import Iterator, Dict, List
+from collections.abc import Iterator
 
 import pytest
 from fastapi import FastAPI

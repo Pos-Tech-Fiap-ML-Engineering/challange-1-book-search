@@ -5,7 +5,7 @@ import logging
 import pytest
 from pytest_mock import MockerFixture
 from unittest.mock import Mock
-from typing import Iterator, Dict
+from collections.abc import Iterator
 
 from src.infrastructure.standard.app_log.AppLoggerImpl import AppLoggerImpl
 from src.standard.app_log.AppLogger import AppLogger
@@ -19,7 +19,9 @@ class TestAppLoggerImpl:
     app_logger: AppLogger
 
     @pytest.fixture(autouse=True)
-    def setup_teardown(self, request: pytest.FixtureRequest, mocker: MockerFixture) -> Iterator[None]:
+    def setup_teardown(
+        self, request: pytest.FixtureRequest, mocker: MockerFixture
+    ) -> Iterator[None]:
         self.logging_mock = LoggingMock.create(mocker)
         self.app_logger = AppLoggerImpl(self.logging_mock)
         yield
@@ -41,15 +43,16 @@ class TestAppLoggerImpl:
     )
     @pytest.mark.parametrize(
         ("extra_in", "expected_extra"),
-        [
-            (None, {}),
-            ({"a": "1", "b": "2"}, {"a": "1", "b": "2"})
-        ],
+        [(None, {}), ({"a": "1", "b": "2"}, {"a": "1", "b": "2"})],
         ids=["no-extra-attributes", "with-extra-attributes"],
     )
-    def test_log_level_forwarding(self, method_name: str, logger_level: int,
-                                  extra_in: Dict[str, str],
-                                  expected_extra: Dict[str, str]) -> None:
+    def test_log_level_forwarding(
+        self,
+        method_name: str,
+        logger_level: int,
+        extra_in: dict[str, str],
+        expected_extra: dict[str, str],
+    ) -> None:
         # arrange
         self.logging_mock.log.side_effect = None
         self.logging_mock.log.return_value = None
@@ -58,7 +61,9 @@ class TestAppLoggerImpl:
         getattr(self.app_logger, method_name)(self._msg, extra_in)
 
         # assert
-        self.logging_mock.log.assert_called_once_with(logger_level, self._msg, exc_info=None, extra=expected_extra)
+        self.logging_mock.log.assert_called_once_with(
+            logger_level, self._msg, exc_info=None, extra=expected_extra
+        )
 
     def test_log_level_error_with_error(self) -> None:
         # arrange
@@ -72,10 +77,12 @@ class TestAppLoggerImpl:
         self.app_logger.error(self._msg, extra={"error": "True"}, exc_info=exception)
 
         # assert
-        self.logging_mock.log.assert_called_once_with(logging.ERROR, self._msg,
-                                                      extra={"error": "True"},
-                                                      exc_info=exception,
-                                                      )
+        self.logging_mock.log.assert_called_once_with(
+            logging.ERROR,
+            self._msg,
+            extra={"error": "True"},
+            exc_info=exception,
+        )
 
     def test_new_scope(self, mocker: MockerFixture) -> None:
         # arrange
@@ -129,8 +136,6 @@ class TestAppLoggerImpl:
         child_scope_nested_1.getChild.return_value = child_scope_nested_2
         child_scope_nested_1.log.side_effect = None
         child_scope_nested_1.log.return_value = None
-
-
 
         self.logging_mock.getChild.side_effect = None
         self.logging_mock.getChild.return_value = child_scope_nested_1

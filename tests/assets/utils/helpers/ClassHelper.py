@@ -1,22 +1,22 @@
 from __future__ import annotations
 
 from dataclasses import is_dataclass, fields
-from typing import Dict, Iterable, List, Set
+from collections.abc import Iterable
 
 
 class ClassHelper:
 
     @staticmethod
     def snapshot_state(
-            obj: object,
-            /,
-            *,
-            include_private: bool = False,
-            include_dunder: bool = False,
-            include_callables: bool = False,
-            include_properties: bool = True,
-    ) -> Dict[str, object]:
-        result: Dict[str, object] = {}
+        obj: object,
+        /,
+        *,
+        include_private: bool = False,
+        include_dunder: bool = False,
+        include_callables: bool = False,
+        include_properties: bool = True,
+    ) -> dict[str, object]:
+        result: dict[str, object] = {}
 
         if is_dataclass(obj):
             result.update(ClassHelper._attrs_from_dataclass(obj))
@@ -41,8 +41,8 @@ class ClassHelper:
         return result
 
     @staticmethod
-    def _attrs_from_dataclass(obj: object) -> Dict[str, object]:
-        out: Dict[str, object] = {}
+    def _attrs_from_dataclass(obj: object) -> dict[str, object]:
+        out: dict[str, object] = {}
         # noinspection PyDataclass
         for f in fields(obj):  # type: ignore[arg-type]  # mypy: fields()
             fname = f.name
@@ -54,23 +54,23 @@ class ClassHelper:
 
     @staticmethod
     def _attrs_from_instance(
-            obj: object,
-            *,
-            include_private: bool,
-            include_dunder: bool,
-            include_callables: bool,
-    ) -> Dict[str, object]:
+        obj: object,
+        *,
+        include_private: bool,
+        include_dunder: bool,
+        include_callables: bool,
+    ) -> dict[str, object]:
 
-        names: Set[str] = set()
+        names: set[str] = set()
 
         if hasattr(obj, "__dict__"):
-            for k in vars(obj).keys():
-                names.add(k)
+            for keys in vars(obj):
+                names.add(keys)
 
         for slot_name in ClassHelper._slot_names(type(obj)):
             names.add(slot_name)
 
-        out: Dict[str, object] = {}
+        out: dict[str, object] = {}
         for name in names:
             if not include_dunder and ClassHelper._is_dunder(name):
                 continue
@@ -90,9 +90,9 @@ class ClassHelper:
         return out
 
     @staticmethod
-    def _slot_names(cls: type[object]) -> Set[str]:
-        names: Set[str] = set()
-        for base in cls.__mro__:
+    def _slot_names(type_obj: type[object]) -> set[str]:
+        names: set[str] = set()
+        for base in type_obj.__mro__:
             if "__slots__" not in base.__dict__:
                 continue
             raw = base.__dict__["__slots__"]
@@ -109,14 +109,14 @@ class ClassHelper:
 
     @staticmethod
     def property_names(
-            cls: type[object],
-            *,
-            include_private: bool = False,
-            include_dunder: bool = False,
-    ) -> List[str]:
-        found: List[str] = []
-        seen: Set[str] = set()
-        for base in cls.__mro__:
+        type_obj: type[object],
+        *,
+        include_private: bool = False,
+        include_dunder: bool = False,
+    ) -> list[str]:
+        found: list[str] = []
+        seen: set[str] = set()
+        for base in type_obj.__mro__:
             for name, attr in base.__dict__.items():
                 if name in seen:
                     continue
@@ -131,12 +131,12 @@ class ClassHelper:
 
     @staticmethod
     def property_values(
-            obj: object,
-            *,
-            names: Iterable[str] | None = None,
-            include_private: bool = False,
-            include_dunder: bool = False,
-    ) -> Dict[str, object]:
+        obj: object,
+        *,
+        names: Iterable[str] | None = None,
+        include_private: bool = False,
+        include_dunder: bool = False,
+    ) -> dict[str, object]:
         cls = type(obj)
         prop_names = (
             list(names)
@@ -148,7 +148,7 @@ class ClassHelper:
             )
         )
 
-        out: Dict[str, object] = {}
+        out: dict[str, object] = {}
         for name in prop_names:
             try:
                 out[name] = getattr(obj, name)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Any
+from typing import Any
 
 from src.standard.error.ApplicationErrorCode import ApplicationErrorCode
 
@@ -8,5 +8,5 @@ from src.standard.error.ApplicationErrorCode import ApplicationErrorCode
 class ApplicationErrorInfo:
     code: ApplicationErrorCode
     message: str
-    cause: Optional[Any]
-    error: Optional[Exception]
+    cause: Any | None
+    error: Exception | None

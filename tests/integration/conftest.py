@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 from pathlib import Path
-from typing import Any, cast, AsyncIterator
+from typing import Any, cast
+from collections.abc import AsyncIterator
 
 import httpx
 import pytest
@@ -63,7 +63,9 @@ def bootstrap(request: FixtureRequest, worker_id: str) -> dict[str, str]:
 def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     with FileLock(LOCK_FILE_PATH, timeout=60):
         state_workers = _safe_read_json(STATE_WORKERS_FILE_PATH)
-        state_workers[bootstrapped_workers_env] = cast(int, state_workers.get(bootstrapped_workers_env)) + 1
+        state_workers[bootstrapped_workers_env] = (
+            cast(int, state_workers.get(bootstrapped_workers_env)) + 1
+        )
         _safe_write_json(STATE_WORKERS_FILE_PATH, state_workers)
 
         if state_workers[bootstrapped_workers_env] == state_workers[bootstrapped_workers_count_env]:

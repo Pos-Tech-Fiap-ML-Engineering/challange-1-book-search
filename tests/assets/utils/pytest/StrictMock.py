@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Iterable
-from typing import Any, NoReturn, TypeVar, Type, overload, cast
+from typing import Any, NoReturn, TypeVar, overload, cast
 from unittest.mock import Mock, AsyncMock
 
 from pytest_mock import MockerFixture
@@ -24,32 +24,22 @@ class StrictMock(Static):
     @classmethod
     @overload
     def make_strict_mock(
-            cls,
-            spec: Type[T],
-            *,
-            allow: Iterable[str] = (),
-            mocker: MockerFixture
-    ) -> T:
-        ...
+        cls, spec: type[T], *, allow: Iterable[str] = (), mocker: MockerFixture
+    ) -> T: ...
 
     @classmethod
     @overload
     def make_strict_mock(
-            cls,
-            spec: T,
-            *,
-            allow: Iterable[str] = (),
-            mocker: MockerFixture,
-    ) -> T:
-        ...
+        cls,
+        spec: T,
+        *,
+        allow: Iterable[str] = (),
+        mocker: MockerFixture,
+    ) -> T: ...
 
     @classmethod
     def make_strict_mock(
-            cls,
-            spec: Type[T] | T,
-            *,
-            allow: Iterable[str] = (),
-            mocker: MockerFixture
+        cls, spec: type[T] | T, *, allow: Iterable[str] = (), mocker: MockerFixture
     ) -> T:
         is_instance: bool = not isinstance(spec, type)
 
@@ -76,12 +66,12 @@ class StrictMock(Static):
             except AttributeError:
                 continue
             if isinstance(sub, Mock):
-                sub.side_effect = (lambda *a, _n=name, **kw: cls._raise_unconfigured(_n))
+                sub.side_effect = lambda *a, _n=name, **kw: cls._raise_unconfigured(_n)
 
         return cast(T, base_mock)
 
     @classmethod
     def make_async_strict_mock(cls) -> AsyncMock:
         async_mock = AsyncMock()
-        async_mock.side_effect = (lambda *a, **kw: cls._raise_unconfigured("async_mock"))
+        async_mock.side_effect = lambda *a, **kw: cls._raise_unconfigured("async_mock")
         return async_mock

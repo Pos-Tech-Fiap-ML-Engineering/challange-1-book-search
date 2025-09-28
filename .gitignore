@@ -209,7 +209,7 @@ __marimo__/
 /requirements-all.txt
 
 # Terraform
-aws_credentials
+.aws_credentials
 .terraform/
 *.tfstate
 *.tfstate.*
