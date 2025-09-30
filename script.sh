@@ -38,16 +38,17 @@ load_default_configs(){
   export TF_VARS=(
     "-var=region=${AWS_REGION}"
     "-var=project_name=${PROJECT_NAME}"
-    "-var=ecs_desired_count=0"
-    "-var=ecr_image_tag=NONE"
+    "-var=ecr_repository_tag=NONE"
   )
   export DOCKER_DIR="${ROOT_DIR}/infra/dockerfile"
-  export ECR_REGISTRY="$(infra_get_output "ecr_repository_url")" || die "Falha ao ler output 'ecr_repository_url' do Terraform"
+  export ECR_REPOSITORY_URL="$(infra_get_output "ecr_repository_url")" || die "Falha ao ler output 'ecr_repository_url' do Terraform"
+  export ECR_REPOSITORY_NAME="$(basename "$ECR_REPOSITORY_URL")"
   export ECS_CLUSTER="$(infra_get_output "ecs_cluster_name")" || die "Falha ao ler output 'ecs_cluster_name' do Terraform"
   export ECS_SERVICE="$(infra_get_output "ecs_service_name")" || die "Falha ao ler output 'ecs_service_name' do Terraform"
   export ECS_DESIRED_ON_DEPLOY=2
   #  export GIT_SHA="$(git rev-parse --short=12 HEAD 2>/dev/null || echo 'local')"
-  export DOCKER_IMAGE_NAME="${ECR_REGISTRY}:latest"
+  #  export IMAGE_TAG="${GIT_SHA:-latest}"
+  export DOCKER_IMAGE_NAME="${ECR_REPOSITORY_URL}:latest"
 }
 
 load_aws_secrets() {
@@ -181,9 +182,9 @@ infra_show_all_outputs(){
 }
 
 aws_ecr_login() {
-  log "Fazendo login no ECR: ${ECR_REGISTRY}"
+  log "Fazendo login no ECR: ${ECR_REPOSITORY_URL}"
   aws --region "$AWS_REGION" ecr get-login-password \
-    | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+    | docker login --username AWS --password-stdin "$ECR_REPOSITORY_URL"
 }
 
 infra_in_dir() (
@@ -206,12 +207,13 @@ infra_init(){
 
 infra_plan(){
   log "terraform plan..."
-  infra_in_dir terraform plan "${TF_VARS[@]}"
+  infra_in_dir terraform plan "${TF_VARS[@]}" -var=ecs_desired_count="$1" -var=ecr_repository_tag="$DOCKER_IMAGE_NAME"
 }
 
 infra_apply(){
   log "terraform apply..."
-  infra_in_dir terraform apply "${TF_VARS[@]}" # -auto-approve
+  infra_in_dir terraform apply "${TF_VARS[@]}" -var=ecs_desired_count="$1" -var=ecr_repository_tag="$DOCKER_IMAGE_NAME" # -auto-approve
+  infra_show_all_outputs| jq . > infra.${ENVIRONMENT}.json
 }
 
 infra_destroy(){
@@ -271,15 +273,17 @@ cd_build(){
 cd_push(){
   aws_ecr_login
   # Garante repositório ECR (idempotente)
-  if ! aws ecr describe-repositories --repository-names "$ECR_REGISTRY" --region "$AWS_REGION" >/dev/null 2>&1; then
-    log "Criando repositório ECR: $ECR_REGISTRY"
-    aws ecr create-repository --repository-name "$ECR_REGISTRY" --region "$AWS_REGION" >/dev/null
+  if ! aws ecr describe-repositories --repository-names "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" >/dev/null 2>&1; then
+    log "Criando repositório ECR: $ECR_REPOSITORY_NAME"
+    aws ecr create-repository --repository-name "$ECR_REPOSITORY_NAME" --region "$AWS_REGION" >/dev/null
   fi
   log "Fazendo push: ${DOCKER_IMAGE_NAME}"
   docker push "${DOCKER_IMAGE_NAME}"
 }
 
-cd_deploy() {
+
+cd_deploy_app_mode() {
+  aws_ecr_login
   log "Atualizando serviço ECS '${ECS_SERVICE}' no cluster '${ECS_CLUSTER}' com a imagem ${DOCKER_IMAGE_NAME}"
 
   # Estado atual do serviço
@@ -345,19 +349,49 @@ cd_deploy() {
 
   # Atualiza o serviço com nova TD (e desired_count se aplicável)
   # Ex.: limite de 20 minutos
+  trap 'echo "❌ Interrompido pelo usuário"; exit 130' INT
+
+  log "Aguardando serviço estabilizar"
+
   if command -v timeout >/dev/null 2>&1; then
     timeout 20m aws ecs wait services-stable \
       --cluster "$ECS_CLUSTER" \
       --services "$ECS_SERVICE" \
-      --region "$AWS_REGION" \
-    && log "Serviço estabilizado." \
-    || die "Timeout: ECS não estabilizou em 20m."
+      --region "$AWS_REGION" || die "Timeout: ECS não estabilizou em 20m."
   else
-    # fallback: usa o waiter padrão (~10 min)
-    aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --region "$AWS_REGION" \
-      && log "Serviço estabilizado." \
-      || die "ECS não estabilizou dentro do tempo padrão (~10m)."
+    aws ecs wait services-stable \
+      --cluster "$ECS_CLUSTER" \
+      --services "$ECS_SERVICE" \
+      --region "$AWS_REGION" || die "Timeout: ECS não estabilizou no tempo padrão."
   fi
+
+  log "Serviço estabilizado."
+}
+
+cd_deploy_terraform_mode() {
+  aws_ecr_login
+
+  infra_apply 2
+
+   # Atualiza o serviço com nova TD (e desired_count se aplicável)
+  # Ex.: limite de 20 minutos
+  trap 'echo "❌ Interrompido pelo usuário"; exit 130' INT
+
+  log "Aguardando serviço estabilizar"
+
+  if command -v timeout >/dev/null 2>&1; then
+    timeout 20m aws ecs wait services-stable \
+      --cluster "$ECS_CLUSTER" \
+      --services "$ECS_SERVICE" \
+      --region "$AWS_REGION"
+  else
+    aws ecs wait services-stable \
+      --cluster "$ECS_CLUSTER" \
+      --services "$ECS_SERVICE" \
+      --region "$AWS_REGION"
+  fi
+
+  log "Serviço estabilizado."
 }
 
 ############################################
@@ -436,11 +470,11 @@ case "$target" in
     ;;
 
   infra:plan)
-    infra_plan
+    infra_plan 0
     ;;
 
   infra:apply)
-    infra_apply
+    infra_apply 0
     ;;
 
   infra:destroy)
@@ -493,12 +527,12 @@ case "$target" in
     ;;
 
   cd:deploy)
-    cd_deploy
+    cd_deploy_terraform_mode
     ;;
 
   cd:build:deploy)
     cd_push
-    cd_deploy
+    cd_deploy_terraform_mode
     ;;
 
   help|*)

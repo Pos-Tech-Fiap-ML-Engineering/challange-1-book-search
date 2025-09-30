@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name         = var.project_name
-      image        = "${var.ecr_repository_url}:${var.ecr_image_tag}"
+      image        = var.ecr_repository_tag
       essential    = true
       portMappings = [{ containerPort = 8000, hostPort = 8000, protocol = "tcp" }]
       environment = [
@@ -63,12 +63,12 @@ resource "aws_ecs_task_definition" "app" {
     }
   ])
 
-  lifecycle {
-    # Se você REALMENTE quer que o TF não altere a TD quando mudar o JSON:
-    ignore_changes = [container_definitions]
-    # (opcional) às vezes também ignoram cpu/memory se o time alterna isso fora do TF
-    # ignore_changes = [container_definitions, cpu, memory]
-  }
+  # lifecycle {
+  #   # Se você REALMENTE quer que o TF não altere a TD quando mudar o JSON:
+  #   ignore_changes = [container_definitions]
+  #   # (opcional) às vezes também ignoram cpu/memory se o time alterna isso fora do TF
+  #   # ignore_changes = [container_definitions, cpu, memory]
+  # }
 }
 
 # Service (ligado ao ALB em alb.tf)
@@ -81,6 +81,8 @@ resource "aws_ecs_service" "app" {
   enable_execute_command             = true
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
+
+  force_new_deployment = true
 
   network_configuration {
     subnets          = var.vpc_private_subnet_ids
@@ -96,9 +98,9 @@ resource "aws_ecs_service" "app" {
 
   depends_on = [aws_lb_listener.http]
 
-  lifecycle {
-    ignore_changes = [task_definition] # ✅ atributo do próprio aws_ecs_service
-    # se usar autoscaling, costuma-se ignorar também desired_count:
-    # ignore_changes = [task_definition, desired_count]
-  }
+  # lifecycle {
+  #   ignore_changes = [task_definition] # ✅ atributo do próprio aws_ecs_service
+  #   # se usar autoscaling, costuma-se ignorar também desired_count:
+  #   # ignore_changes = [task_definition, desired_count]
+  # }
 }

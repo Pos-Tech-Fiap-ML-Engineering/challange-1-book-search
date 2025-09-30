@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "aws" {
-  region                   = var.region
+  region = var.region
   default_tags {
     tags = module.common-metadata.common_tags
   }
@@ -51,5 +51,5 @@ module "ecs" {
   task_execution_role_arn = module.iam.task_execution_role_arn
   task_role_arn           = module.iam.task_role_arn
   ecr_repository_url      = module.ecr.repository_url
-  ecr_image_tag           = var.ecr_image_tag
+  ecr_repository_tag      = var.ecr_repository_tag
 }

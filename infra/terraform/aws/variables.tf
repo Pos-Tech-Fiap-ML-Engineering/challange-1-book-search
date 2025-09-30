@@ -40,8 +40,8 @@ variable "ecs_desired_count" {
   nullable    = false
 }
 
-variable "ecr_image_tag" {
-  description = "Nome da imagem a ser utilizada pela task no ec"
+variable "ecr_repository_tag" {
+  description = "Nome do repositório mas tag da imagem a ser utilizada pela task no ec"
   type        = string
   nullable    = false
 }
