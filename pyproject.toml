@@ -146,6 +146,7 @@ testpaths = ["tests"]
 #norecursedirs = ["infra", "docs"]
 # Garante que o src/ entre no sys.path
 asyncio_mode = "auto"   # faz o pytest detectar testes async automaticamente
+#asyncio_default_fixture_loop_scope = "session"
 pythonpath = ["src"]
 markers = [
     "unit: fast unit tests",
@@ -247,7 +248,7 @@ lint = { sequence = [ # --verbose with need more details
 typecheck = { cmd = "mypy" }
 test_unit = { sequence = [
     "clean_coverage",
-    { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -n auto --dist loadfile" }] }
-test_integration = { cmd = "pytest -m integration -n auto -s --dist loadfile" }
-test_e2e = { cmd = "pytest -m e2e -n auto --dist loadfile" }
+    { cmd = "pytest -m unit --cov-context=test --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing -n auto --dist loadfile -v" }] }
+test_integration = { cmd = "pytest -m integration -n auto -s --dist loadfile -v" }
+test_e2e = { cmd = "pytest -m e2e -n auto --dist loadfile -v" }
 pre_commit = { sequence = ["fmt", "lint", "typecheck", "audit"] }

@@ -1,0 +1,67 @@
+{
+  "alb_dns_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws-cloud-challange-dev-alb-402052449.us-east-1.elb.amazonaws.com"
+  },
+  "alb_health_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "http://aws-cloud-challange-dev-alb-402052449.us-east-1.elb.amazonaws.com/api/v1/health"
+  },
+  "alb_lb_target_group_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:elasticloadbalancing:us-east-1:355262196527:targetgroup/aws-cloud-challange-dev-tg/c8473c887f221f6e"
+  },
+  "alb_service_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "http://aws-cloud-challange-dev-alb-402052449.us-east-1.elb.amazonaws.com"
+  },
+  "ecr_repository_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "355262196527.dkr.ecr.us-east-1.amazonaws.com/aws-cloud-challange-dev-ecr"
+  },
+  "ecs_cluster_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:ecs:us-east-1:355262196527:cluster/aws-cloud-challange-dev"
+  },
+  "ecs_cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws-cloud-challange-dev"
+  },
+  "ecs_log_group_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "/ecs/aws-cloud-challange-dev"
+  },
+  "ecs_service_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:ecs:us-east-1:355262196527:service/aws-cloud-challange-dev/aws-cloud-challange-dev-svc"
+  },
+  "ecs_service_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws-cloud-challange-dev-svc"
+  },
+  "ecs_service_security_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-0096f1371cc6871ae"
+  },
+  "ecs_task_definition_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:ecs:us-east-1:355262196527:task-definition/aws-cloud-challange-dev:8"
+  },
+  "ecs_task_definition_family": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws-cloud-challange-dev"
+  }
+}

@@ -31,7 +31,7 @@ variable "ecr_repository_url" {
   type = string
 }
 
-variable "ecr_image_tag" {
+variable "ecr_repository_tag" {
   type = string
 }
 
