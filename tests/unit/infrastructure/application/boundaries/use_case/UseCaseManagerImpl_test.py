@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 from unittest.mock import Mock, AsyncMock, call
-from typing import NoReturn, Any
+from typing import NoReturn, Any, cast
 from collections.abc import Iterator
 
 from src.application.boundaries.use_case.UseCase import UseCase
@@ -19,7 +19,13 @@ from src.application.boundaries.use_case.validator.UseCaseInputNotificationError
     UseCaseInputNotificationErrors,
 )
 from src.infrastructure.application.boundaries.use_case.UseCaseManagerImpl import UseCaseManagerImpl
+from src.standard.error.errors.ErrorStandardUseCaseInputInvalidType import (
+    ErrorStandardUseCaseInputInvalidType,
+)
 from src.standard.error.errors.ErrorStandardUseCaseNotFound import ErrorStandardUseCaseNotFound
+from src.standard.error.errors.ErrorStandardUseCaseOutputHandlerInvalidType import (
+    ErrorStandardUseCaseOutputHandlerInvalidType,
+)
 from src.standard.error.errors.ErrorStandardUseCaseOutputNotHandlerInvalidInput import (
     ErrorStandardUseCaseOutputNotHandlerInvalidInput,
 )
@@ -51,7 +57,6 @@ class _UseCaseOutputHandlerTestHandlerErrorAndInvalidInput(
 # noinspection PyUnresolvedReferences
 class _UseCaseOk(UseCase[_UseCaseInputTest, _UseCaseOutputHandlerTest]):
     input_type: type[_UseCaseInputTest] = _UseCaseInputTest
-    output_type: type[_UseCaseOutputHandlerTest] = _UseCaseOutputHandlerTest
 
     def __init__(self) -> None:
         self.execute_async_mock: AsyncMock = StrictMock.make_async_strict_mock()
@@ -70,9 +75,6 @@ class _UseCaseValidator(
     UseCaseInputValidator,
 ):
     input_type: type[_UseCaseInputTest] = _UseCaseInputTest
-    output_type: type[_UseCaseOutputHandlerTestHandlerErrorAndInvalidInput] = (
-        _UseCaseOutputHandlerTestHandlerErrorAndInvalidInput
-    )
 
     def __init__(self) -> None:
         self.execute_async_mock = StrictMock.make_async_strict_mock()
@@ -97,7 +99,6 @@ class _UseCaseValidatorWithoutOutputUseCaseHandlerValidatorInput(
     UseCaseInputValidator,
 ):
     input_type: type[_UseCaseInputTest] = _UseCaseInputTest
-    output_type: type[_UseCaseOutputHandlerTest] = _UseCaseOutputHandlerTest
 
     def __init__(self) -> None:
         self.execute_async_mock = StrictMock.make_async_strict_mock()
@@ -221,6 +222,38 @@ class TestUseCaseManagerImpl:
         called_args, called_kwargs = uc.validate_async_mock.call_args
         assert called_args[0] is inp
         assert isinstance(called_args[1], UseCaseInputNotificationErrors)
+
+    async def test_raise_when_input_is_not_instance_use_case_input(self) -> None:
+        # arrange
+        class _InvalidInput: ...
+
+        use_case_input = _InvalidInput()
+        use_case_manager = UseCaseManagerImpl(self._logger_mock, [])
+
+        # act - assert
+        with pytest.raises(ErrorStandardUseCaseInputInvalidType):
+            # noinspection PyInvalidCast
+            await use_case_manager.execute_async(
+                cast(UseCaseInput, use_case_input),
+                _UseCaseOutputHandlerTest(),
+                meta_information=None,
+            )
+
+    async def test_raise_when_output_is_not_instance_use_case_output_handler(self) -> None:
+        # arrange
+        class _InvalidOutputHandler: ...
+
+        use_case_output_handler = _InvalidOutputHandler()
+        use_case_manager = UseCaseManagerImpl(self._logger_mock, [])
+
+        # act - assert
+        with pytest.raises(ErrorStandardUseCaseOutputHandlerInvalidType):
+            # noinspection PyInvalidCast
+            await use_case_manager.execute_async(
+                _UseCaseInputTest(),
+                cast(UseCaseOutputHandler, use_case_output_handler),
+                meta_information=None,
+            )
 
     async def test_raise_when_not_found_use_case(self) -> None:
         # arrange

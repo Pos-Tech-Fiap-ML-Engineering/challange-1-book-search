@@ -12,7 +12,6 @@ TOutput = TypeVar("TOutput", bound=UseCaseOutputHandler)
 
 class UseCase[TInput, TOutput](Abstract):
     input_type: type[UseCaseInput]
-    output_type: type[UseCaseOutputHandler]
 
     @abstractmethod
     async def execute_async(self, use_case_input: TInput, use_case_output: TOutput) -> None:

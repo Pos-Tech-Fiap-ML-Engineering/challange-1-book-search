@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.api.AppBuilder import AppBuilder
+from src.AppBuilder import AppBuilder
 
 app_builder = AppBuilder()
 

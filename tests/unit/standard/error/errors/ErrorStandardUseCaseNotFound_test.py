@@ -8,19 +8,16 @@ class TestErrorStandardUseCaseNotFound:
         # arrange
         class Input: ...
 
-        class Output: ...
-
         # act
-        error = ErrorStandardUseCaseNotFound(Input, Output)
+        error = ErrorStandardUseCaseNotFound(Input)
 
         # assert
-        assert str(error) == "Not found UseCase to Input/Output"
+        assert str(error) == "Not found UseCase to Input"
         assert error.error_info == ApplicationErrorInfo(
             code=ApplicationErrorCode.STANDARD_ERROR_USE_CASE_NOT_FOUND,
-            message=f"Not found UseCase to {Input.__name__}/{Output.__name__}",
+            message=f"Not found UseCase to {Input.__name__}",
             cause={
                 "use_case_input_type": Input,
-                "use_case_outpu_type": Output,
             },
             error=None,
         )
