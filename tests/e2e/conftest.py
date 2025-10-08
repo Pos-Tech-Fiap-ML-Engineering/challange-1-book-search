@@ -1,24 +1,22 @@
-import asyncio
 import json
-import sys
+from collections.abc import AsyncIterator
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, cast
-
-from collections.abc import AsyncIterator, Iterator
 
 import httpx
 import pytest
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 
+from src.infrastructure.utils.RootDir import RootDir
 from tests.e2e.utils.E2EBootstrapConfigs import E2EBootstrapConfigs
 from tests.e2e.utils.E2EHttpAuth import BasicAuthenticationTokenProvider, E2EHttpAuth
-from tests.utils.UtilsTest import UtilsTest
 
 
 def _infra_path() -> Path:
-    return UtilsTest.find_root_by_file_name().joinpath("infra.dev.json")
+    return RootDir.find_root_by_file_name().joinpath("infra.dev.json")
+
 
 @lru_cache(maxsize=1)
 def _load_infra() -> dict[str, Any]:
@@ -31,30 +29,35 @@ def _load_infra() -> dict[str, Any]:
 def bootstrap(request: FixtureRequest) -> E2EBootstrapConfigs:
     json_file_loaded = _load_infra()
 
-    e2e_configs = E2EBootstrapConfigs(json_file_loaded["alb_service_url"]["value"], "admin", "admin")
+    e2e_configs = E2EBootstrapConfigs(
+        json_file_loaded["alb_service_url"]["value"], "admin", "admin"
+    )
 
     return e2e_configs
 
 
 @pytest.fixture(scope="session")
 def token_provider(bootstrap: E2EBootstrapConfigs) -> BasicAuthenticationTokenProvider:
-    return BasicAuthenticationTokenProvider(bootstrap.service_token_username, bootstrap.service_token_password)
+    return BasicAuthenticationTokenProvider(
+        bootstrap.service_token_username, bootstrap.service_token_password
+    )
 
 
 @pytest_asyncio.fixture(scope="function")
-async def http_client(bootstrap: E2EBootstrapConfigs, token_provider: BasicAuthenticationTokenProvider) -> \
-        AsyncIterator[httpx.AsyncClient]:
+async def http_client(
+    bootstrap: E2EBootstrapConfigs, token_provider: BasicAuthenticationTokenProvider
+) -> AsyncIterator[httpx.AsyncClient]:
     headers: httpx.Headers = httpx.Headers()
 
     timeout = httpx.Timeout(connect=5.0, read=15.0, write=10.0, pool=5.0)
 
     async with httpx.AsyncClient(
-            base_url=bootstrap.service_url,
-            timeout=timeout,
-            follow_redirects=True,
-            headers=headers,
-            verify=True,
-            limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
-            auth=E2EHttpAuth(token_provider)
+        base_url=bootstrap.service_url,
+        timeout=timeout,
+        follow_redirects=True,
+        headers=headers,
+        verify=True,
+        limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
+        auth=E2EHttpAuth(token_provider),
     ) as http_client:
         yield http_client

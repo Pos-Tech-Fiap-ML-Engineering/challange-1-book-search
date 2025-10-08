@@ -22,9 +22,9 @@ class AppLoggerImpl(AppLogger):
 
     def __init__(self, logger: Logger) -> None:
         self._logger_manager: contextvars.ContextVar[_LogEntry] = contextvars.ContextVar(
-            AppLoggerImpl.__name__
+            AppLoggerImpl.__name__,
+            default=_LogEntry(logger=logger, extra_attrs={}),
         )
-        self._logger_manager.set(_LogEntry(logger=logger))
 
     def debug(self, message: str, extra: dict[str, str] | None = None) -> None:
         self._generate_log(logging.DEBUG, message, extra, None)

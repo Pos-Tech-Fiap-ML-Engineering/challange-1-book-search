@@ -10,7 +10,13 @@ from src.application.boundaries.use_case.output.UseCaseOutputHandlerInvalidInput
 )
 from src.application.boundaries.use_case.UseCaseInputValidator import UseCaseInputValidator
 from src.standard.app_log.AppLogger import AppLogger
+from src.standard.error.errors.ErrorStandardUseCaseInputInvalidType import (
+    ErrorStandardUseCaseInputInvalidType,
+)
 from src.standard.error.errors.ErrorStandardUseCaseNotFound import ErrorStandardUseCaseNotFound
+from src.standard.error.errors.ErrorStandardUseCaseOutputHandlerInvalidType import (
+    ErrorStandardUseCaseOutputHandlerInvalidType,
+)
 from src.standard.error.errors.ErrorStandardUseCaseOutputNotHandlerInvalidInput import (
     ErrorStandardUseCaseOutputNotHandlerInvalidInput,
 )
@@ -20,9 +26,7 @@ class UseCaseManagerImpl(UseCaseManager):
 
     def __init__(self, logger: AppLogger, use_cases: list[UseCase]) -> None:
         self._logger: AppLogger = logger
-        self._use_cases: dict[tuple[type[UseCaseInput], type[UseCaseOutputHandler]], UseCase] = {
-            (uc.input_type, uc.output_type): uc for uc in use_cases
-        }
+        self._use_cases: dict[type[UseCaseInput], UseCase] = {uc.input_type: uc for uc in use_cases}
 
     async def execute_async(
         self,
@@ -30,7 +34,9 @@ class UseCaseManagerImpl(UseCaseManager):
         use_case_output_handler: UseCaseOutputHandler,
         meta_information: dict[str, str] | None,
     ) -> None:
-        uc = self._find_use_case(use_case_input, use_case_output_handler)
+        self._validate_use_case_input_output(use_case_input, use_case_output_handler)
+
+        uc = self._find_use_case(use_case_input)
         uc_name = type(uc).__name__
         with self._logger.new_scope(uc_name, extra=meta_information):
             try:
@@ -45,17 +51,23 @@ class UseCaseManagerImpl(UseCaseManager):
             except Exception as e:
                 await self._handler_error_async(e, use_case_output_handler)
 
-    def _find_use_case(
-        self, use_case_input: UseCaseInput, use_case_output_handler: UseCaseOutputHandler
-    ) -> UseCase:
-        use_case_input_type = type(use_case_input)
-        use_case_output_type = type(use_case_output_handler)
+    def _validate_use_case_input_output(
+        self, use_case_input: UseCaseInput, use_case_output: UseCaseOutputHandler
+    ) -> None:
+        if not isinstance(use_case_input, UseCaseInput):
+            raise ErrorStandardUseCaseInputInvalidType(type(use_case_input))
 
-        uc = self._use_cases.get((use_case_input_type, use_case_output_type), None)
+        if not isinstance(use_case_output, UseCaseOutputHandler):
+            raise ErrorStandardUseCaseOutputHandlerInvalidType(type(use_case_output))
+
+    def _find_use_case(self, use_case_input: UseCaseInput) -> UseCase:
+        use_case_input_type = type(use_case_input)
+
+        uc = self._use_cases.get(use_case_input_type, None)
         if uc is not None:
             return uc
 
-        raise ErrorStandardUseCaseNotFound(use_case_input_type, use_case_output_type)
+        raise ErrorStandardUseCaseNotFound(use_case_input_type)
 
     async def _is_invalid_input_async(
         self,
