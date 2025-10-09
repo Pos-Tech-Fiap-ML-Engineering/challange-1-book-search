@@ -7,9 +7,11 @@ import logging
 
 from src.api.controllers.Router import Router
 from src.api.controllers.abstractions.BaseController import BaseController
+from src.api.controllers.v1.BooksController import BooksController
 from src.api.controllers.v1.HealthController import HealthController
 from src.application.boundaries.factory.HttpClientFactory import HttpClientFactory
 from src.application.boundaries.use_case.UseCaseManager import UseCaseManager
+from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseImpl import ListAllBooksUseCaseImpl
 from src.application.use_cases.book.scrape_books.ScrapeBooksUseCaseImpl import (
     ScrapeBooksUseCaseImpl,
 )
@@ -70,6 +72,9 @@ class AppBuilder:
                     ScrapeBooksUseCaseImpl(
                         http_client_factory=self.http_client_factory,
                         scrape_book_repository=self.scrape_book_repository,
+                    ),
+                    ListAllBooksUseCaseImpl(
+                        repository=self.scrape_book_repository,
                     )
                 ],
             )
@@ -82,6 +87,7 @@ class AppBuilder:
             self._controllers = {
                 self.V1_CONTROLLERS: [
                     HealthController(),
+                    BooksController(self.use_caser_manager),
                 ]
             }
 
@@ -119,13 +125,13 @@ class AppBuilder:
         return _run
 
     def override_instances(
-        self,
-        param_app_logger: AppLogger | None = None,
-        param_http_client_factory: HttpClientFactory | None = None,
-        param_scrape_book_repository: ScrapeBookRepository | None = None,
-        param_use_caser_manager: UseCaseManager | None = None,
-        param_controllers: dict[str, list[BaseController]] | None = None,
-        param_fast_api: FastAPI | None = None,
+            self,
+            param_app_logger: AppLogger | None = None,
+            param_http_client_factory: HttpClientFactory | None = None,
+            param_scrape_book_repository: ScrapeBookRepository | None = None,
+            param_use_caser_manager: UseCaseManager | None = None,
+            param_controllers: dict[str, list[BaseController]] | None = None,
+            param_fast_api: FastAPI | None = None,
     ) -> None:
         self._app_logger = param_app_logger or self.app_logger
         self._http_client_factory = param_http_client_factory or self.http_client_factory

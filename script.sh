@@ -46,9 +46,11 @@ load_default_configs(){
   export ECS_CLUSTER="$(infra_get_output "ecs_cluster_name")" || die "Falha ao ler output 'ecs_cluster_name' do Terraform"
   export ECS_SERVICE="$(infra_get_output "ecs_service_name")" || die "Falha ao ler output 'ecs_service_name' do Terraform"
   export ECS_DESIRED_ON_DEPLOY=2
-  #  export GIT_SHA="$(git rev-parse --short=12 HEAD 2>/dev/null || echo 'local')"
-  #  export IMAGE_TAG="${GIT_SHA:-latest}"
-  export DOCKER_IMAGE_NAME="${ECR_REPOSITORY_URL}:latest"
+  export GIT_SHA="$(git rev-parse --short=12 HEAD 2>/dev/null || echo 'local')"
+  export IMAGE_TAG="${GIT_SHA:-latest}"
+  export DOCKER_IMAGE_NAME="${ECR_REPOSITORY_URL}:${IMAGE_TAG}"
+#  export DOCKER_IMAGE_NAME="${ECR_REPOSITORY_URL}:latest"
+
 }
 
 load_aws_secrets() {
@@ -265,9 +267,29 @@ ci_test_e2e(){
 ############################################
 # CD (build/push/deploy)
 ############################################
+cd_scrape_books(){
+    local mode="${1:-}"
+
+    log "Scraping books"
+
+    if [[ "$mode" != "execute_scrape" ]]; then
+        log "⚠️  Execução do scraping ignorada"
+        return 0
+    fi
+
+
+   if poetry run python -m src.scripts.Main; then
+      log "✅ Scraping finalizado com sucesso"
+   else
+      log "❌ Erro ao executar o scraping"
+      return 1
+   fi
+}
+
 cd_build(){
- log "Docker build: ${DOCKER_IMAGE_NAME}"
- docker_in_dir docker build -t $DOCKER_IMAGE_NAME -f Dockerfile ../../
+  cd_scrape_books "$1"
+  log "Docker build: ${DOCKER_IMAGE_NAME}"
+  docker_in_dir docker build -t $DOCKER_IMAGE_NAME -f Dockerfile ../../
 }
 
 cd_push(){
@@ -428,9 +450,10 @@ CI:
   ci:all                              - executa todo CI do projeto
 
 CD:
-  cd:build                            - docker build (tag: ECR/GIT_SHA)
+  cd:build                            - docker build (tag: ECR/GIT_SHA) param  execute_scrape para fazer webscraping dos livros
   cd:push                             - login ECR, cria repo se preciso, push da imagem
   cd:deploy                           - atualiza ECS service com nova TaskDef (imagem atualizada)
+  cd:build:push:deploy                - Realiza todas as tarefas cd:build cd:push cd:deploy
 
 HELP:
   help                                - mostra este help
@@ -519,7 +542,7 @@ case "$target" in
     ;;
 
   cd:build)
-    cd_build
+    cd_build "${2:-}"
     ;;
 
   cd:push)
@@ -530,7 +553,8 @@ case "$target" in
     cd_deploy_terraform_mode
     ;;
 
-  cd:build:deploy)
+  cd:build:push:deploy)
+    cd_build "${2:-}"
     cd_push
     cd_deploy_terraform_mode
     ;;
