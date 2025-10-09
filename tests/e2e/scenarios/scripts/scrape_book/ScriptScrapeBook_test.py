@@ -7,12 +7,14 @@ import pytest
 
 from src.domain.scrape_book.vos.Money import Money
 from src.infrastructure.domain.scrape_book.ScrapeBookRepositoryImpl import ScrapeBookRepositoryImpl
+from src.infrastructure.utils.RootDir import RootDir
 from src.scripts.Main import app_builder, script_scrape_books
 
 
 class TestScriptScrapeBook:
     _PATH_BOOKS: Path = Path(__file__).parent.resolve() / "book.csv"
-    _PATH_EXPECTED_BOOKS: Path = Path(__file__).parent.resolve() / "expected_books.csv"
+    _PATH_EXPECTED_BOOKS: Path = RootDir.find_root_by_file_name(filename="conftest.py",
+                                                                file=__file__) / "data" / "expected_books.csv"
 
     @pytest.fixture(autouse=True)
     def setup_teardown(self, request: pytest.FixtureRequest) -> Iterator[None]:

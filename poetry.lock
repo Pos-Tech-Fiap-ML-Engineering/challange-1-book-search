@@ -1699,17 +1699,6 @@ files = [
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
-name = "pydevd-pycharm"
-version = "253.20558.58"
-description = "PyCharm Debugger (used in PyCharm and PyDev)"
-optional = false
-python-versions = "*"
-groups = ["dev"]
-files = [
-    {file = "pydevd_pycharm-253.20558.58.tar.gz", hash = "sha256:7715ba39e46506455390d95a1150cd0ca7c833730cb51d3588c1ef45f7766a1d"},
-]
-
-[[package]]
 name = "pygments"
 version = "2.19.2"
 description = "Pygments is a syntax highlighting package written in Python."
@@ -2567,4 +2556,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.13"
-content-hash = "b9f4030255f6e955dc9a33f398fc955a7ff454da1237b514e23df988147279b3"
+content-hash = "4dc176f7561d14b347e174673453a9464c56e71a49b14da11885a35045c7a8c7"

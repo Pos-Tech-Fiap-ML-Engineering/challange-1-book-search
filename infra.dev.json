@@ -57,7 +57,7 @@
   "ecs_task_definition_arn": {
     "sensitive": false,
     "type": "string",
-    "value": "arn:aws:ecs:us-east-1:355262196527:task-definition/aws-cloud-challange-dev:8"
+    "value": "arn:aws:ecs:us-east-1:355262196527:task-definition/aws-cloud-challange-dev:9"
   },
   "ecs_task_definition_family": {
     "sensitive": false,
