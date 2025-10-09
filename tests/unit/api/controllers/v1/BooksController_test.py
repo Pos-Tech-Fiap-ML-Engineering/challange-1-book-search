@@ -6,8 +6,11 @@ import pytest
 from pytest_mock import MockerFixture
 
 from src.api.controllers.v1.BooksController import BooksController
+from src.api.presenters.GetBookByIdUseCaseOutputPresenterImpl import GetBookByIdUseCaseOutputPresenterImpl
 from src.api.presenters.ListAllBooksUseCaseOutputPresenterImpl import ListAllBooksUseCaseOutputPresenterImpl
 from src.api.schemas.output.BookOutput import BookOutput
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseImpl import GetBookByIdUseCaseImpl
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseInput import GetBookByIdUseCaseInput
 from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseInput import ListAllBooksUseCaseInput
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
@@ -58,3 +61,31 @@ class TestBooksController:
         assert isinstance(called_args[0], ListAllBooksUseCaseInput)
         assert isinstance(called_args[1], ListAllBooksUseCaseOutputPresenterImpl)
         assert called_kwargs == {'meta_information': None}
+
+
+    async def test_get_book_by_id_successfully(self) -> None:
+        # arrange
+        book = ScrapeBookFaker.fake()
+
+        expected_result = BookOutput.to_output_json(book)
+
+        def a(*args: Tuple[Any], **kwargs: dict[str, Any]) -> None:
+            cast(GetBookByIdUseCaseOutputPresenterImpl, cast(object, args[1])).success(book)
+
+        self._use_case_manager_mock.execute_async.side_effect = a
+
+        # act
+        result = await self._controller.get_book_by_id_async(book.id)
+
+        router = self._controller.get_router()
+
+        # assert
+        assert result.status_code == 200
+        assert json.loads(result.body.decode("utf-8")) == expected_result  # type: ignore
+        assert router.prefix == "/books"
+
+        assert self._use_case_manager_mock.execute_async.call_count == 1
+        called_args, called_kwargs = self._use_case_manager_mock.execute_async.call_args_list[0]
+        assert isinstance(called_args[0], GetBookByIdUseCaseInput)
+        assert isinstance(called_args[1], GetBookByIdUseCaseOutputPresenterImpl)
+        assert called_kwargs == {'meta_information': {'book_id': str(book.id)}}

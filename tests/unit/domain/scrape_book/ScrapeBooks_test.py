@@ -64,3 +64,29 @@ class TestScrapeBooks:
         assert [b.title for b in books] == ["First", "Second"]
         assert first in books
         assert ScrapeBookFaker.fake(title="Other") not in books
+
+    def test_get_book_by_id_and_return_book_when_found(self) -> None:
+        # arrange
+        books = ScrapeBooks()
+        books.append(ScrapeBookFaker.fake())
+        books.append(ScrapeBookFaker.fake())
+        books.append(ScrapeBookFaker.fake())
+
+        # act
+        book = books.get_by_id(books[1].id)
+
+        # assert
+        assert book == books[1]
+
+    def test_get_book_by_id_and_return_none_when_not_found(self) -> None:
+        # arrange
+        books = ScrapeBooks()
+        books.append(ScrapeBookFaker.fake())
+        books.append(ScrapeBookFaker.fake())
+        books.append(ScrapeBookFaker.fake())
+
+        # act
+        book = books.get_by_id(books[-1].id + 172)
+
+        # assert
+        assert book is None

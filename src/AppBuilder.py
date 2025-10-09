@@ -11,6 +11,7 @@ from src.api.controllers.v1.BooksController import BooksController
 from src.api.controllers.v1.HealthController import HealthController
 from src.application.boundaries.factory.HttpClientFactory import HttpClientFactory
 from src.application.boundaries.use_case.UseCaseManager import UseCaseManager
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseImpl import GetBookByIdUseCaseImpl
 from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseImpl import ListAllBooksUseCaseImpl
 from src.application.use_cases.book.scrape_books.ScrapeBooksUseCaseImpl import (
     ScrapeBooksUseCaseImpl,
@@ -73,9 +74,8 @@ class AppBuilder:
                         http_client_factory=self.http_client_factory,
                         scrape_book_repository=self.scrape_book_repository,
                     ),
-                    ListAllBooksUseCaseImpl(
-                        repository=self.scrape_book_repository,
-                    )
+                    ListAllBooksUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    GetBookByIdUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
                 ],
             )
 

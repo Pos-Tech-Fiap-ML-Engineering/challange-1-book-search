@@ -27,7 +27,7 @@ class TestListAllBooksUseCaseImpl:
         self._scrape_book_repository_mock = ScrapeBookRepositoryMock.create(mocker)
         self._use_case_input = ListAllBooksUseCaseInput()
         self._use_case_output_mock = ListAllBooksUseCaseOutputHandlerMock.create(mocker)
-        self._use_case = ListAllBooksUseCaseImpl(repository=self._scrape_book_repository_mock)
+        self._use_case = ListAllBooksUseCaseImpl(scrape_book_repository=self._scrape_book_repository_mock)
 
         yield
 
