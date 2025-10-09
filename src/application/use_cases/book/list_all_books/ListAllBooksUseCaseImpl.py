@@ -8,8 +8,8 @@ from src.domain.scrape_book.repository.ScrapeBookRepository import ScrapeBookRep
 class ListAllBooksUseCaseImpl(UseCase[ListAllBooksUseCaseInput, ListAllBooksUseCaseOutputHandler]):
     input_type: type[ListAllBooksUseCaseInput] = ListAllBooksUseCaseInput
 
-    def __init__(self, repository: ScrapeBookRepository) -> None:
-        self._repository = repository
+    def __init__(self, scrape_book_repository: ScrapeBookRepository) -> None:
+        self._repository = scrape_book_repository
 
     async def execute_async(self, use_case_input: ListAllBooksUseCaseInput,
                             use_case_output: ListAllBooksUseCaseOutputHandler) -> None:

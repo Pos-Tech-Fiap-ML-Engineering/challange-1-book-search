@@ -14,3 +14,7 @@ class ScrapeBooks(list[ScrapeBook]):
         self.categories.add(item.category)
 
         super().append(item)
+
+
+    def get_by_id(self, book_id: int) -> ScrapeBook | None:
+        return next(filter(lambda book: book.id == book_id, self), None)

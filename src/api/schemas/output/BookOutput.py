@@ -4,6 +4,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from src.domain.scrape_book.ScrapeBook import ScrapeBook
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 
 
@@ -24,8 +25,16 @@ class BookOutput(BaseModel):
     product_page_url: str
 
     @staticmethod
+    def to_output(book: ScrapeBook) -> BookOutput:
+        return BookOutput.model_validate(book.to_dict())
+
+    @staticmethod
     def to_output_list(books: ScrapeBooks) -> list[BookOutput]:
-        return [BookOutput.model_validate(b.to_dict()) for b in books]
+        return [BookOutput.to_output(b) for b in books]
+
+    @staticmethod
+    def to_output_json(book: ScrapeBook) -> dict[str, Any]:
+        return BookOutput.to_output(book).model_dump(mode="json")
 
     @staticmethod
     def to_output_list_json(books: ScrapeBooks) -> list[dict[str, Any]]:
