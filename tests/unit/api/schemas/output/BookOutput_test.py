@@ -1,6 +1,9 @@
+from typing import cast
+
 import pytest
 
 from src.api.schemas.output.BookOutput import BookOutput
+from src.domain.scrape_book.ScrapeBook import ScrapeBook
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
 
@@ -18,9 +21,15 @@ class TestBookOutput:
         assert isinstance(output, BookOutput)
         assert output.id == book.id
 
-    def test_to_output_list_should_return_list_of_book_outputs(self) -> None:
+    @pytest.mark.parametrize(
+        "books",
+        [
+            ScrapeBooks(),
+            cast(list[ScrapeBook], []),
+        ]
+    )
+    def test_to_output_list_should_return_list_of_book_outputs(self, books: ScrapeBooks | list[ScrapeBook]) -> None:
         # arrange
-        books = ScrapeBooks()
         books.append(ScrapeBookFaker.fake())
         books.append(ScrapeBookFaker.fake())
 
@@ -65,9 +74,15 @@ class TestBookOutput:
         with pytest.raises(Exception):
             BookOutput.to_output_json(book)
 
-    def test_to_output_list_json_should_return_serializable_dicts(self) -> None:
+    @pytest.mark.parametrize(
+        "books",
+        [
+            ScrapeBooks(),
+            cast(list[ScrapeBook], []),
+        ]
+    )
+    def test_to_output_list_json_should_return_serializable_dicts(self, books: ScrapeBooks | list[ScrapeBook]) -> None:
         # arrange
-        books = ScrapeBooks()
         books.append(ScrapeBookFaker.fake())
 
         # act

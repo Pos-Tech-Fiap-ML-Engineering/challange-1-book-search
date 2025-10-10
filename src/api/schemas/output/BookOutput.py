@@ -29,7 +29,7 @@ class BookOutput(BaseModel):
         return BookOutput.model_validate(book.to_dict())
 
     @staticmethod
-    def to_output_list(books: ScrapeBooks) -> list[BookOutput]:
+    def to_output_list(books: ScrapeBooks | list[ScrapeBook]) -> list[BookOutput]:
         return [BookOutput.to_output(b) for b in books]
 
     @staticmethod
@@ -37,7 +37,6 @@ class BookOutput(BaseModel):
         return BookOutput.to_output(book).model_dump(mode="json")
 
     @staticmethod
-    def to_output_list_json(books: ScrapeBooks) -> list[dict[str, Any]]:
+    def to_output_list_json(books: ScrapeBooks | list[ScrapeBook]) -> list[dict[str, Any]]:
         return [b.model_dump(mode="json") for b in BookOutput.to_output_list(books)]
-
 
