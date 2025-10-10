@@ -1,8 +1,9 @@
 import pytest
 
 from src.application.boundaries.use_case.output.UseCaseOutputHandler import UseCaseOutputHandler
-from src.application.use_cases.book.list_books_by_title_category.ListBooksByCategoryTitleUseCaseOutputHandler import \
-    ListBooksByCategoryTitleUseCaseOutputHandler
+from src.application.use_cases.book.list_books_by_title_category.ListBooksByCategoryTitleUseCaseOutputHandler import (
+    ListBooksByCategoryTitleUseCaseOutputHandler,
+)
 
 
 class TestListBooksByCategoryTitleUseCaseOutputHandler:

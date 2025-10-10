@@ -1,5 +1,7 @@
 from src.application.boundaries.use_case.input.UseCaseInput import UseCaseInput
-from src.application.use_cases.category.list_categories.ListCategoriesUseCaseInput import ListCategoriesUseCaseInput
+from src.application.use_cases.category.list_categories.ListCategoriesUseCaseInput import (
+    ListCategoriesUseCaseInput,
+)
 
 
 class TestListCategoriesUseCaseInput:

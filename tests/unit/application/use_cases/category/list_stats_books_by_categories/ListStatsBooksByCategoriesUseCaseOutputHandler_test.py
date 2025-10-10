@@ -1,8 +1,9 @@
 import pytest
 
 from src.application.boundaries.use_case.output.UseCaseOutputHandler import UseCaseOutputHandler
-from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseOutputHandler import \
-    ListStatsBooksByCategoriesUseCaseOutputHandler
+from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseOutputHandler import (
+    ListStatsBooksByCategoriesUseCaseOutputHandler,
+)
 
 
 class TestListStatsBooksByCategoriesUseCaseOutputHandler:
@@ -13,4 +14,4 @@ class TestListStatsBooksByCategoriesUseCaseOutputHandler:
     def test_class_can_not_be_instantiated(self) -> None:
         # arrange - act - assert
         with pytest.raises(TypeError):
-            ListStatsBooksByCategoriesUseCaseOutputHandler()  # type: 
+            ListStatsBooksByCategoriesUseCaseOutputHandler()  # type: ignore

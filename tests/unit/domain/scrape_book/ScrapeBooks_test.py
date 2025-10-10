@@ -113,17 +113,34 @@ class TestScrapeBooks:
         result_book_in_title_0 = books.list_books_by_category_or_title(title="Title 0")
         result_book_in_title_1 = books.list_books_by_category_or_title(title="Title 1")
         result_book_in_title_2 = books.list_books_by_category_or_title(title="Title 2")
-        result_book_in_title_1_category_1 = books.list_books_by_category_or_title(title="Title 1", category="1")
-        result_book_in_title_3_category_2 = books.list_books_by_category_or_title(title="Title 3", category="2")
-        result_book_in_title_5_category_3 = books.list_books_by_category_or_title(title="Title 5", category="3")
-        result_empty_when_not_found_books_in_category = books.list_books_by_category_or_title(category="Not Exist")
-        result_empty_when_not_found_books_in_title = books.list_books_by_category_or_title(title="Not Exist")
-        result_empty_when_mismatch_title_and_category = books.list_books_by_category_or_title(title="Title 0",
-                                                                                              category="3")
+        result_book_in_title_1_category_1 = books.list_books_by_category_or_title(
+            title="Title 1", category="1"
+        )
+        result_book_in_title_3_category_2 = books.list_books_by_category_or_title(
+            title="Title 3", category="2"
+        )
+        result_book_in_title_5_category_3 = books.list_books_by_category_or_title(
+            title="Title 5", category="3"
+        )
+        result_empty_when_not_found_books_in_category = books.list_books_by_category_or_title(
+            category="Not Exist"
+        )
+        result_empty_when_not_found_books_in_title = books.list_books_by_category_or_title(
+            title="Not Exist"
+        )
+        result_empty_when_mismatch_title_and_category = books.list_books_by_category_or_title(
+            title="Title 0", category="3"
+        )
 
         # assert
-        assert result_all_books_when_empty_title_and_category == [books[0], books[1], books[2], books[3], books[4],
-                                                                  books[5]]
+        assert result_all_books_when_empty_title_and_category == [
+            books[0],
+            books[1],
+            books[2],
+            books[3],
+            books[4],
+            books[5],
+        ]
         assert result_all_books_in_category_1 == [books[0], books[1], books[2]]
         assert result_all_books_in_category_2 == [books[3], books[4]]
         assert result_all_books_in_category_3 == [books[5]]
@@ -170,13 +187,27 @@ class TestScrapeBooks:
     def test_get_stats_books_by_category_successfully(self) -> None:
         # arrange
         books = ScrapeBooks()
-        books.append(ScrapeBookFaker.fake(category="1", price_full=Money.from_float(10), rating=Rating(1)))
-        books.append(ScrapeBookFaker.fake(category="1", price_full=Money.from_float(20), rating=Rating(3)))
-        books.append(ScrapeBookFaker.fake(category="1", price_full=Money.from_float(30), rating=Rating(3)))
-        books.append(ScrapeBookFaker.fake(category="2", price_full=Money.from_float(40), rating=Rating(3)))
-        books.append(ScrapeBookFaker.fake(category="2", price_full=Money.from_float(50), rating=Rating(5)))
-        books.append(ScrapeBookFaker.fake(category="3", price_full=Money.from_float(60), rating=Rating(5)))
-        books.append(ScrapeBookFaker.fake(category="4", price_full=Money.from_float(60), rating=Rating(5)))
+        books.append(
+            ScrapeBookFaker.fake(category="1", price_full=Money.from_float(10), rating=Rating(1))
+        )
+        books.append(
+            ScrapeBookFaker.fake(category="1", price_full=Money.from_float(20), rating=Rating(3))
+        )
+        books.append(
+            ScrapeBookFaker.fake(category="1", price_full=Money.from_float(30), rating=Rating(3))
+        )
+        books.append(
+            ScrapeBookFaker.fake(category="2", price_full=Money.from_float(40), rating=Rating(3))
+        )
+        books.append(
+            ScrapeBookFaker.fake(category="2", price_full=Money.from_float(50), rating=Rating(5))
+        )
+        books.append(
+            ScrapeBookFaker.fake(category="3", price_full=Money.from_float(60), rating=Rating(5))
+        )
+        books.append(
+            ScrapeBookFaker.fake(category="4", price_full=Money.from_float(60), rating=Rating(5))
+        )
 
         # act
         book_stats_category = books.get_stats_books_by_category()
@@ -186,7 +217,7 @@ class TestScrapeBooks:
             "1": BookStats(3, Decimal(20), {1: 1, 3: 2}),
             "2": BookStats(2, Decimal(45), {3: 1, 5: 1}),
             "3": BookStats(1, Decimal(60), {5: 1}),
-            "4": BookStats(1, Decimal(60), {5: 1})
+            "4": BookStats(1, Decimal(60), {5: 1}),
         }
 
     def test_get_stats_books_by_category_with_empty_books_successfully(self) -> None:
@@ -202,12 +233,36 @@ class TestScrapeBooks:
     def test_list_top_rated_books(self) -> None:
         # arrange
         books = ScrapeBooks()
-        books.append(ScrapeBookFaker.fake(model_id=1, category="1", price_full=Money.from_float(10), rating=Rating(1)))
-        books.append(ScrapeBookFaker.fake(model_id=2, category="1", price_full=Money.from_float(20), rating=Rating(5)))
-        books.append(ScrapeBookFaker.fake(model_id=3, category="1", price_full=Money.from_float(30), rating=Rating(3)))
-        books.append(ScrapeBookFaker.fake(model_id=4, category="2", price_full=Money.from_float(40), rating=Rating(4)))
-        books.append(ScrapeBookFaker.fake(model_id=5, category="2", price_full=Money.from_float(50), rating=Rating(4)))
-        books.append(ScrapeBookFaker.fake(model_id=6, category="3", price_full=Money.from_float(60), rating=Rating(3)))
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=1, category="1", price_full=Money.from_float(10), rating=Rating(1)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=2, category="1", price_full=Money.from_float(20), rating=Rating(5)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=3, category="1", price_full=Money.from_float(30), rating=Rating(3)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=4, category="2", price_full=Money.from_float(40), rating=Rating(4)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=5, category="2", price_full=Money.from_float(50), rating=Rating(4)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=6, category="3", price_full=Money.from_float(60), rating=Rating(3)
+            )
+        )
 
         # act
         top_rated_books = books.list_top_rated_books(limit=4)
@@ -224,3 +279,108 @@ class TestScrapeBooks:
 
         # assert
         assert top_rated_books == []
+
+    def test_books_in_price_range_successfully(self) -> None:
+        # arrange
+        books = ScrapeBooks()
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=1, category="1", price_full=Money.from_float(50), rating=Rating(1)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=2, category="1", price_full=Money.from_float(60), rating=Rating(1)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=3, category="1", price_full=Money.from_float(40), rating=Rating(5)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=4, category="1", price_full=Money.from_float(30), rating=Rating(3)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=5, category="2", price_full=Money.from_float(20), rating=Rating(4)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=6, category="2", price_full=Money.from_float(50), rating=Rating(4)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=7, category="3", price_full=Money.from_float(0), rating=Rating(3)
+            )
+        )
+        books.append(
+            ScrapeBookFaker.fake(
+                model_id=8, category="3", price_full=Money.from_float(5), rating=Rating(3)
+            )
+        )
+
+        # act
+        books_price_range_0_0 = books.list_books_by_price_range(
+            min_price=Decimal(0), max_price=Decimal(0)
+        )
+        books_price_range_0_10 = books.list_books_by_price_range(
+            min_price=Decimal(0), max_price=Decimal(10)
+        )
+        books_price_range_10_20 = books.list_books_by_price_range(
+            min_price=Decimal(10), max_price=Decimal(20)
+        )
+        books_price_range_20_40 = books.list_books_by_price_range(
+            min_price=Decimal(20), max_price=Decimal(40)
+        )
+        books_price_range_0_100 = books.list_books_by_price_range(
+            min_price=Decimal(0), max_price=Decimal(100)
+        )
+        books_price_range_60_100 = books.list_books_by_price_range(
+            min_price=Decimal(60), max_price=Decimal(100)
+        )
+        books_price_range_100_200 = books.list_books_by_price_range(
+            min_price=Decimal(100), max_price=Decimal(200)
+        )
+
+        # assert
+        assert books_price_range_0_0 == [books[6]]
+        assert books_price_range_0_10 == [books[6], books[7]]
+        assert books_price_range_10_20 == [books[4]]
+        assert books_price_range_20_40 == [books[4], books[3], books[2]]
+        assert books_price_range_0_100 == [
+            books[6],
+            books[7],
+            books[4],
+            books[3],
+            books[2],
+            books[0],
+            books[5],
+            books[1],
+        ]
+        assert books_price_range_60_100 == [books[1]]
+        assert books_price_range_100_200 == []
+
+    def test_books_in_price_range_when_books_empty_successfully(self) -> None:
+        # arrange
+        books = ScrapeBooks()
+
+        # act
+        books_price_range_0_0 = books.list_books_by_price_range(
+            min_price=Decimal(0), max_price=Decimal(0)
+        )
+        books_price_range_0_10 = books.list_books_by_price_range(
+            min_price=Decimal(0), max_price=Decimal(10)
+        )
+        books_price_range_10_20 = books.list_books_by_price_range(
+            min_price=Decimal(10), max_price=Decimal(20)
+        )
+
+        # assert
+        assert books_price_range_0_0 == []
+        assert books_price_range_0_10 == []
+        assert books_price_range_10_20 == []

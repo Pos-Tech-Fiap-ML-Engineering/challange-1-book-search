@@ -1,24 +1,46 @@
 import json
-from typing import Iterator, Any, Tuple, cast
+from decimal import Decimal
+from typing import Any, cast
+from collections.abc import Iterator
 from unittest.mock import Mock
 
 import pytest
 from pytest_mock import MockerFixture
 
 from src.api.controllers.v1.BooksController import BooksController
-from src.api.presenters.GetBookByIdUseCaseOutputPresenterImpl import GetBookByIdUseCaseOutputPresenterImpl
-from src.api.presenters.ListAllBooksUseCaseOutputPresenterImpl import ListAllBooksUseCaseOutputPresenterImpl
-from src.api.presenters.ListBooksByCategoryTitleUseCaseOutputPresenterImpl import \
-    ListBooksByCategoryTitleUseCaseOutputPresenterImpl
-from src.api.presenters.ListTopRatedBooksUseCaseOutputPresenterImpl import ListTopRatedBooksUseCaseOutputPresenterImpl
+from src.api.presenters.GetBookByIdUseCaseOutputPresenterImpl import (
+    GetBookByIdUseCaseOutputPresenterImpl,
+)
+from src.api.presenters.ListAllBooksUseCaseOutputPresenterImpl import (
+    ListAllBooksUseCaseOutputPresenterImpl,
+)
+from src.api.presenters.ListBooksByCategoryTitleUseCaseOutputPresenterImpl import (
+    ListBooksByCategoryTitleUseCaseOutputPresenterImpl,
+)
+from src.api.presenters.ListBooksByPriceRangeUseCaseOutputPresenterImpl import (
+    ListBooksByPriceRangeUseCaseOutputPresenterImpl,
+)
+from src.api.presenters.ListTopRatedBooksUseCaseOutputPresenterImpl import (
+    ListTopRatedBooksUseCaseOutputPresenterImpl,
+)
 from src.api.schemas.output.BookOutput import BookOutput
-from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseInput import GetBookByIdUseCaseInput
-from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseInput import ListAllBooksUseCaseInput
-from src.application.use_cases.book.list_books_by_title_category.ListBooksByCategoryTitleUseCaseInput import \
-    ListBooksByCategoryTitleUseCaseInput
-from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseInput import \
-    ListTopRatedBooksUseCaseInput
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseInput import (
+    GetBookByIdUseCaseInput,
+)
+from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseInput import (
+    ListAllBooksUseCaseInput,
+)
+from src.application.use_cases.book.list_books_by_price_range.ListBooksByPriceRangeUseCaseInput import (
+    ListBooksByPriceRangeUseCaseInput,
+)
+from src.application.use_cases.book.list_books_by_title_category.ListBooksByCategoryTitleUseCaseInput import (
+    ListBooksByCategoryTitleUseCaseInput,
+)
+from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseInput import (
+    ListTopRatedBooksUseCaseInput,
+)
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
+from src.domain.scrape_book.vos.Money import Money
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
 from tests.assets.mocks.UseCaseManagerMock import UseCaseManagerMock
 
@@ -47,7 +69,7 @@ class TestBooksController:
 
         expected_result = BookOutput.to_output_list_json(books)
 
-        def a(*args: Tuple[Any], **kwargs: dict[str, Any]) -> None:
+        def a(*args: tuple[Any], **kwargs: dict[str, Any]) -> None:
             cast(ListAllBooksUseCaseOutputPresenterImpl, cast(object, args[1])).success(books)
 
         self._use_case_manager_mock.execute_async.side_effect = a
@@ -66,7 +88,7 @@ class TestBooksController:
         called_args, called_kwargs = self._use_case_manager_mock.execute_async.call_args_list[0]
         assert isinstance(called_args[0], ListAllBooksUseCaseInput)
         assert isinstance(called_args[1], ListAllBooksUseCaseOutputPresenterImpl)
-        assert called_kwargs == {'meta_information': None}
+        assert called_kwargs == {"meta_information": None}
 
     async def test_list_books_by_title_and_category_successfully(self) -> None:
         # arrange
@@ -77,8 +99,10 @@ class TestBooksController:
 
         expected_result = BookOutput.to_output_list_json(books)
 
-        def a(*args: Tuple[Any], **kwargs: dict[str, Any]) -> None:
-            cast(ListBooksByCategoryTitleUseCaseOutputPresenterImpl, cast(object, args[1])).success(books)
+        def a(*args: tuple[Any], **kwargs: dict[str, Any]) -> None:
+            cast(ListBooksByCategoryTitleUseCaseOutputPresenterImpl, cast(object, args[1])).success(
+                books
+            )
 
         self._use_case_manager_mock.execute_async.side_effect = a
 
@@ -96,7 +120,7 @@ class TestBooksController:
         called_args, called_kwargs = self._use_case_manager_mock.execute_async.call_args_list[0]
         assert isinstance(called_args[0], ListBooksByCategoryTitleUseCaseInput)
         assert isinstance(called_args[1], ListBooksByCategoryTitleUseCaseOutputPresenterImpl)
-        assert called_kwargs == {'meta_information': None}
+        assert called_kwargs == {"meta_information": None}
 
     async def test_list_top_rated_books_successfully(self) -> None:
         # arrange
@@ -107,7 +131,7 @@ class TestBooksController:
 
         expected_result = BookOutput.to_output_list_json(books)
 
-        def a(*args: Tuple[Any], **kwargs: dict[str, Any]) -> None:
+        def a(*args: tuple[Any], **kwargs: dict[str, Any]) -> None:
             cast(ListTopRatedBooksUseCaseOutputPresenterImpl, cast(object, args[1])).success(books)
 
         self._use_case_manager_mock.execute_async.side_effect = a
@@ -126,7 +150,44 @@ class TestBooksController:
         called_args, called_kwargs = self._use_case_manager_mock.execute_async.call_args_list[0]
         assert isinstance(called_args[0], ListTopRatedBooksUseCaseInput)
         assert isinstance(called_args[1], ListTopRatedBooksUseCaseOutputPresenterImpl)
-        assert called_kwargs == {'meta_information': None}
+        assert called_kwargs == {"meta_information": None}
+
+    async def test_list_books_by_price_range(self) -> None:
+        # arrange
+        books = ScrapeBooks()
+        books.append(ScrapeBookFaker.fake(price_full=Money.from_float(10)))
+        books.append(ScrapeBookFaker.fake(price_full=Money.from_float(11)))
+        books.append(ScrapeBookFaker.fake(price_full=Money.from_float(12)))
+        books.append(ScrapeBookFaker.fake(price_full=Money.from_float(13)))
+        books.append(ScrapeBookFaker.fake(price_full=Money.from_float(14)))
+
+        expected_result = BookOutput.to_output_list_json(
+            books.list_books_by_price_range(Decimal(11), Decimal(13))
+        )
+
+        def a(*args: tuple[Any], **kwargs: dict[str, Any]) -> None:
+            cast(ListBooksByPriceRangeUseCaseOutputPresenterImpl, cast(object, args[1])).success(
+                books.list_books_by_price_range(Decimal(11), Decimal(13))
+            )
+
+        self._use_case_manager_mock.execute_async.side_effect = a
+
+        # act
+        result = await self._controller.list_books_by_price_range_async(Decimal(11), Decimal(13))
+
+        router = self._controller.get_router()
+
+        # assert
+        assert result.status_code == 200
+        body = json.loads(result.body.decode("utf-8"))  # type: ignore
+        assert body == expected_result
+        assert router.prefix == "/books"
+
+        assert self._use_case_manager_mock.execute_async.call_count == 1
+        called_args, called_kwargs = self._use_case_manager_mock.execute_async.call_args_list[0]
+        assert isinstance(called_args[0], ListBooksByPriceRangeUseCaseInput)
+        assert isinstance(called_args[1], ListBooksByPriceRangeUseCaseOutputPresenterImpl)
+        assert called_kwargs == {"meta_information": None}
 
     async def test_get_book_by_id_successfully(self) -> None:
         # arrange
@@ -134,7 +195,7 @@ class TestBooksController:
 
         expected_result = BookOutput.to_output_json(book)
 
-        def a(*args: Tuple[Any], **kwargs: dict[str, Any]) -> None:
+        def a(*args: tuple[Any], **kwargs: dict[str, Any]) -> None:
             cast(GetBookByIdUseCaseOutputPresenterImpl, cast(object, args[1])).success(book)
 
         self._use_case_manager_mock.execute_async.side_effect = a
@@ -153,4 +214,4 @@ class TestBooksController:
         called_args, called_kwargs = self._use_case_manager_mock.execute_async.call_args_list[0]
         assert isinstance(called_args[0], GetBookByIdUseCaseInput)
         assert isinstance(called_args[1], GetBookByIdUseCaseOutputPresenterImpl)
-        assert called_kwargs == {'meta_information': {'book_id': str(book.id)}}
+        assert called_kwargs == {"meta_information": {"book_id": str(book.id)}}

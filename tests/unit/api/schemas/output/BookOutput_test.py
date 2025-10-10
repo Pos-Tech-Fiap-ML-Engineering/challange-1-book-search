@@ -26,9 +26,11 @@ class TestBookOutput:
         [
             ScrapeBooks(),
             cast(list[ScrapeBook], []),
-        ]
+        ],
     )
-    def test_to_output_list_should_return_list_of_book_outputs(self, books: ScrapeBooks | list[ScrapeBook]) -> None:
+    def test_to_output_list_should_return_list_of_book_outputs(
+        self, books: ScrapeBooks | list[ScrapeBook]
+    ) -> None:
         # arrange
         books.append(ScrapeBookFaker.fake())
         books.append(ScrapeBookFaker.fake())
@@ -79,9 +81,11 @@ class TestBookOutput:
         [
             ScrapeBooks(),
             cast(list[ScrapeBook], []),
-        ]
+        ],
     )
-    def test_to_output_list_json_should_return_serializable_dicts(self, books: ScrapeBooks | list[ScrapeBook]) -> None:
+    def test_to_output_list_json_should_return_serializable_dicts(
+        self, books: ScrapeBooks | list[ScrapeBook]
+    ) -> None:
         # arrange
         books.append(ScrapeBookFaker.fake())
 

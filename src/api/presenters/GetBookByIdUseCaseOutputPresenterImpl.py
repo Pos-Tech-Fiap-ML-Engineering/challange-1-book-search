@@ -1,7 +1,8 @@
 from src.api.presenters.base.BasePresenter import BasePresenter
 from src.api.schemas.output.BookOutput import BookOutput
-from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseOutputHandler import \
-    GetBookByIdUseCaseOutputHandler
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseOutputHandler import (
+    GetBookByIdUseCaseOutputHandler,
+)
 from src.domain.scrape_book.ScrapeBook import ScrapeBook
 
 from fastapi.responses import JSONResponse

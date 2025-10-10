@@ -2,7 +2,9 @@ import json
 
 from fastapi.responses import Response, JSONResponse
 
-from src.api.presenters.ListCategoriesUseCaseOutputPresenterImpl import ListCategoriesUseCaseOutputPresenterImpl
+from src.api.presenters.ListCategoriesUseCaseOutputPresenterImpl import (
+    ListCategoriesUseCaseOutputPresenterImpl,
+)
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
 

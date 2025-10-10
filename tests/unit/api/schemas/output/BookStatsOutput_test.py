@@ -26,7 +26,7 @@ class TestBookStatsOutput:
         assert isinstance(model.avg_price, Decimal)
         assert model.avg_price == book_stats.avg_price
         assert model.rating_distribution == book_stats.rating_distribution
-        assert all(isinstance(k, int) for k in model.rating_distribution.keys())
+        assert all(isinstance(k, int) for k in model.rating_distribution)
 
     def test_to_output_json_returns_plain_dict_json_safe(self) -> None:
         # arrange
@@ -41,7 +41,9 @@ class TestBookStatsOutput:
         data = BookStatsOutput.to_output_json(book_stats)
 
         # assert
-        rating_distribution_expected = {str(k): v for k, v in book_stats.rating_distribution.items()}
+        rating_distribution_expected = {
+            str(k): v for k, v in book_stats.rating_distribution.items()
+        }
 
         assert isinstance(data, dict)
         assert data["total_books"] == book_stats.total_books
@@ -50,7 +52,7 @@ class TestBookStatsOutput:
         assert isinstance(data["avg_price"], str)
 
         assert data["rating_distribution"] == rating_distribution_expected
-        assert all(isinstance(k, str) for k in data["rating_distribution"].keys())
+        assert all(isinstance(k, str) for k in data["rating_distribution"])
 
     def test_to_output_json_is_dumpable_with_stdlib_json(self) -> None:
         # arrange

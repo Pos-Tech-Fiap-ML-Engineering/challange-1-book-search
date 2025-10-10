@@ -27,8 +27,9 @@ class ScrapeBooks(list[ScrapeBook]):
     def get_by_id(self, book_id: int) -> ScrapeBook | None:
         return next(filter(lambda book: book.id == book_id, self), None)
 
-    def list_books_by_category_or_title(self, title: str | None = None, category: str | None = None) -> list[
-        ScrapeBook]:
+    def list_books_by_category_or_title(
+        self, title: str | None = None, category: str | None = None
+    ) -> list[ScrapeBook]:
         if title is None and category is None:
             return self
 
@@ -68,10 +69,18 @@ class ScrapeBooks(list[ScrapeBook]):
         rating_distribution: dict[int, int] = {}
 
         if total_books == 0:
-            return BookStats(total_books=total_books, avg_price=sum_price, rating_distribution=rating_distribution)
+            return BookStats(
+                total_books=total_books,
+                avg_price=sum_price,
+                rating_distribution=rating_distribution,
+            )
 
         for book in books:
-            price = book.price_full if isinstance(book.price_full, Decimal) else Decimal(str(book.price_full))
+            price = (
+                book.price_full
+                if isinstance(book.price_full, Decimal)
+                else Decimal(str(book.price_full))
+            )
             sum_price += price
 
             r: int = int(book.rating)
@@ -83,3 +92,7 @@ class ScrapeBooks(list[ScrapeBook]):
 
     def list_top_rated_books(self, limit: int = 10) -> list[ScrapeBook]:
         return sorted(self, key=lambda book: book.rating, reverse=True)[:limit]
+
+    def list_books_by_price_range(self, min_price: Decimal, max_price: Decimal) -> list[ScrapeBook]:
+        filtered_books = filter(lambda book: min_price <= book.price_full <= max_price, self)
+        return sorted(filtered_books, key=lambda book: book.price_full, reverse=False)

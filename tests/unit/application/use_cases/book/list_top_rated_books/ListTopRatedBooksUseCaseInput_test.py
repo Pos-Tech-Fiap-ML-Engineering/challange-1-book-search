@@ -1,6 +1,7 @@
 from src.application.boundaries.use_case.input.UseCaseInput import UseCaseInput
-from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseInput import \
-    ListTopRatedBooksUseCaseInput
+from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseInput import (
+    ListTopRatedBooksUseCaseInput,
+)
 
 
 class TestListTopRatedBooksUseCaseInput:
