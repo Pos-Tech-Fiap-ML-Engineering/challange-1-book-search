@@ -65,7 +65,6 @@ py-serializable==2.1.0 ; python_version == "3.12"
 pycparser==2.23 ; (platform_python_implementation != "PyPy" or sys_platform == "darwin") and implementation_name != "PyPy" and python_version == "3.12" and (sys_platform == "linux" or sys_platform == "darwin")
 pydantic-core==2.33.2 ; python_version == "3.12"
 pydantic==2.11.9 ; python_version == "3.12"
-pydevd-pycharm==253.20558.58 ; python_version == "3.12"
 pygments==2.19.2 ; python_version == "3.12"
 pyparsing==3.2.4 ; python_version == "3.12"
 pyproject-hooks==1.2.0 ; python_version == "3.12"

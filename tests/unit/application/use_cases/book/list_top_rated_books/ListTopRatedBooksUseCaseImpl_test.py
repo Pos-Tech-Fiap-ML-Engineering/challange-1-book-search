@@ -1,17 +1,21 @@
-from typing import Iterator
+from collections.abc import Iterator
 from unittest.mock import Mock
 
 import pytest
 from pytest_mock import MockerFixture
 
-from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseImpl import \
-    ListTopRatedBooksUseCaseImpl
-from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseInput import \
-    ListTopRatedBooksUseCaseInput
+from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseImpl import (
+    ListTopRatedBooksUseCaseImpl,
+)
+from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseInput import (
+    ListTopRatedBooksUseCaseInput,
+)
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from src.domain.scrape_book.vos.Rating import Rating
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
-from tests.assets.mocks.ListTopRatedBooksUseCaseOutputHandlerMock import ListTopRatedBooksUseCaseOutputHandlerMock
+from tests.assets.mocks.ListTopRatedBooksUseCaseOutputHandlerMock import (
+    ListTopRatedBooksUseCaseOutputHandlerMock,
+)
 from tests.assets.mocks.ScrapeBookRepositoryMock import ScrapeBookRepositoryMock
 
 
@@ -23,13 +27,15 @@ class TestListTopRatedBooksUseCaseImpl:
 
     @pytest.fixture(autouse=True)
     def setup_teardown(
-            self,
-            mocker: MockerFixture,
+        self,
+        mocker: MockerFixture,
     ) -> Iterator[None]:
         self._scrape_book_repository_mock = ScrapeBookRepositoryMock.create(mocker)
         self._use_case_input = ListTopRatedBooksUseCaseInput()
         self._use_case_output_mock = ListTopRatedBooksUseCaseOutputHandlerMock.create(mocker)
-        self._use_case = ListTopRatedBooksUseCaseImpl(scrape_book_repository=self._scrape_book_repository_mock)
+        self._use_case = ListTopRatedBooksUseCaseImpl(
+            scrape_book_repository=self._scrape_book_repository_mock
+        )
 
         yield
 
@@ -42,7 +48,9 @@ class TestListTopRatedBooksUseCaseImpl:
         books.append(ScrapeBookFaker.fake(rating=Rating(2)))
         books.append(ScrapeBookFaker.fake(rating=Rating(1)))
 
-        self._scrape_book_repository_mock.get_all_books_async.side_effect = lambda *args, **kwargs: books
+        self._scrape_book_repository_mock.get_all_books_async.side_effect = (
+            lambda *args, **kwargs: books
+        )
         self._use_case_output_mock.success.side_effect = None
 
         # act

@@ -2,7 +2,9 @@ import json
 
 from fastapi.responses import JSONResponse, Response
 
-from src.api.presenters.ListAllBooksUseCaseOutputPresenterImpl import ListAllBooksUseCaseOutputPresenterImpl
+from src.api.presenters.ListAllBooksUseCaseOutputPresenterImpl import (
+    ListAllBooksUseCaseOutputPresenterImpl,
+)
 from src.api.schemas.output.BookOutput import BookOutput
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
@@ -45,7 +47,6 @@ class TestListAllBooksUseCaseOutputPresenterImpl:
         assert result.status_code == 200
         body = json.loads(result.body.decode("utf-8"))  # type: ignore
         assert body == []
-
 
     async def test_result_async_default_output_not_implemented_before_success(self) -> None:
         # arrange

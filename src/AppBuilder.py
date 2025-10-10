@@ -13,22 +13,36 @@ from src.api.controllers.v1.HealthController import HealthController
 from src.api.controllers.v1.StatsController import StatsController
 from src.application.boundaries.factory.HttpClientFactory import HttpClientFactory
 from src.application.boundaries.use_case.UseCaseManager import UseCaseManager
-from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseImpl import GetBookByIdUseCaseImpl
-from src.application.use_cases.book.get_book_stats.GetBookStatsUseCaseImpl import GetBookStatsUseCaseImpl
-from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseImpl import ListAllBooksUseCaseImpl
-from src.application.use_cases.book.list_books_by_title_category.ListBooksByCategoryTitleUseCaseImpl import \
-    ListBooksByCategoryTitleUseCaseImpl
-from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseImpl import \
-    ListTopRatedBooksUseCaseImpl
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseImpl import (
+    GetBookByIdUseCaseImpl,
+)
+from src.application.use_cases.book.get_book_stats.GetBookStatsUseCaseImpl import (
+    GetBookStatsUseCaseImpl,
+)
+from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseImpl import (
+    ListAllBooksUseCaseImpl,
+)
+from src.application.use_cases.book.list_books_by_price_range.ListBooksByPriceRangeUseCaseImpl import (
+    ListBooksByPriceRangeUseCaseImpl,
+)
+from src.application.use_cases.book.list_books_by_title_category.ListBooksByCategoryTitleUseCaseImpl import (
+    ListBooksByCategoryTitleUseCaseImpl,
+)
+from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseImpl import (
+    ListTopRatedBooksUseCaseImpl,
+)
 from src.application.use_cases.book.scrape_books.ScrapeBooksUseCaseImpl import (
     ScrapeBooksUseCaseImpl,
 )
 from src.application.use_cases.book.scrape_books.ScrapeBooksUseCaseInput import (
     ScrapeBooksUseCaseInput,
 )
-from src.application.use_cases.category.list_categories.ListCategoriesUseCaseImpl import ListCategoriesUseCaseImpl
-from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseImpl import \
-    ListStatsBooksByCategoriesUseCaseImpl
+from src.application.use_cases.category.list_categories.ListCategoriesUseCaseImpl import (
+    ListCategoriesUseCaseImpl,
+)
+from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseImpl import (
+    ListStatsBooksByCategoriesUseCaseImpl,
+)
 from src.domain.scrape_book.repository.ScrapeBookRepository import ScrapeBookRepository
 from src.infrastructure.application.boundaries.factory.HttpClientFactoryImpl import (
     HttpClientFactoryImpl,
@@ -86,11 +100,20 @@ class AppBuilder:
                     ),
                     ListAllBooksUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
                     GetBookByIdUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
-                    ListBooksByCategoryTitleUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    ListBooksByCategoryTitleUseCaseImpl(
+                        scrape_book_repository=self.scrape_book_repository
+                    ),
                     ListCategoriesUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
                     GetBookStatsUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
-                    ListStatsBooksByCategoriesUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
-                    ListTopRatedBooksUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    ListStatsBooksByCategoriesUseCaseImpl(
+                        scrape_book_repository=self.scrape_book_repository
+                    ),
+                    ListTopRatedBooksUseCaseImpl(
+                        scrape_book_repository=self.scrape_book_repository
+                    ),
+                    ListBooksByPriceRangeUseCaseImpl(
+                        scrape_book_repository=self.scrape_book_repository
+                    ),
                 ],
             )
 
@@ -142,13 +165,13 @@ class AppBuilder:
         return _run
 
     def override_instances(
-            self,
-            param_app_logger: AppLogger | None = None,
-            param_http_client_factory: HttpClientFactory | None = None,
-            param_scrape_book_repository: ScrapeBookRepository | None = None,
-            param_use_caser_manager: UseCaseManager | None = None,
-            param_controllers: dict[str, list[BaseController]] | None = None,
-            param_fast_api: FastAPI | None = None,
+        self,
+        param_app_logger: AppLogger | None = None,
+        param_http_client_factory: HttpClientFactory | None = None,
+        param_scrape_book_repository: ScrapeBookRepository | None = None,
+        param_use_caser_manager: UseCaseManager | None = None,
+        param_controllers: dict[str, list[BaseController]] | None = None,
+        param_fast_api: FastAPI | None = None,
     ) -> None:
         self._app_logger = param_app_logger or self.app_logger
         self._http_client_factory = param_http_client_factory or self.http_client_factory

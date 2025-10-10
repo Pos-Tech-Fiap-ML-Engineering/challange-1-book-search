@@ -2,8 +2,9 @@ import json
 
 from fastapi.responses import Response, JSONResponse
 
-from src.api.presenters.ListStatsBooksByCategoriesUseCaseOutputPresenterImpl import \
-    ListStatsBooksByCategoriesUseCaseOutputPresenterImpl
+from src.api.presenters.ListStatsBooksByCategoriesUseCaseOutputPresenterImpl import (
+    ListStatsBooksByCategoriesUseCaseOutputPresenterImpl,
+)
 from src.api.schemas.output.BookStatsOutput import BookStatsOutput
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
@@ -21,7 +22,9 @@ class TestListStatsBooksByCategoriesUseCaseOutputPresenterImpl:
 
         stats_books_by_categories = books.get_stats_books_by_category()
 
-        expected_result = {k: BookStatsOutput.to_output_json(v) for k, v in stats_books_by_categories.items()}
+        expected_result = {
+            k: BookStatsOutput.to_output_json(v) for k, v in stats_books_by_categories.items()
+        }
 
         # act
         presenter.success(stats_books_by_categories)

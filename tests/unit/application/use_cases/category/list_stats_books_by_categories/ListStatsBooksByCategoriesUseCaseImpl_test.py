@@ -1,17 +1,20 @@
-from typing import Iterator
+from collections.abc import Iterator
 from unittest.mock import Mock
 
 import pytest
 from pytest_mock import MockerFixture
 
-from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseImpl import \
-    ListStatsBooksByCategoriesUseCaseImpl
-from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseInput import \
-    ListStatsBooksByCategoriesUseCaseInput
+from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseImpl import (
+    ListStatsBooksByCategoriesUseCaseImpl,
+)
+from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseInput import (
+    ListStatsBooksByCategoriesUseCaseInput,
+)
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
-from tests.assets.mocks.ListStatsBooksByCategoriesUseCaseOutputHandlerMock import \
-    ListStatsBooksByCategoriesUseCaseOutputHandlerMock
+from tests.assets.mocks.ListStatsBooksByCategoriesUseCaseOutputHandlerMock import (
+    ListStatsBooksByCategoriesUseCaseOutputHandlerMock,
+)
 from tests.assets.mocks.ScrapeBookRepositoryMock import ScrapeBookRepositoryMock
 
 
@@ -23,13 +26,17 @@ class TestListStatsBooksByCategoriesUseCaseImpl:
 
     @pytest.fixture(autouse=True)
     def setup_teardown(
-            self,
-            mocker: MockerFixture,
+        self,
+        mocker: MockerFixture,
     ) -> Iterator[None]:
         self._scrape_book_repository_mock = ScrapeBookRepositoryMock.create(mocker)
         self._use_case_input = ListStatsBooksByCategoriesUseCaseInput()
-        self._use_case_output_mock = ListStatsBooksByCategoriesUseCaseOutputHandlerMock.create(mocker)
-        self._use_case = ListStatsBooksByCategoriesUseCaseImpl(scrape_book_repository=self._scrape_book_repository_mock)
+        self._use_case_output_mock = ListStatsBooksByCategoriesUseCaseOutputHandlerMock.create(
+            mocker
+        )
+        self._use_case = ListStatsBooksByCategoriesUseCaseImpl(
+            scrape_book_repository=self._scrape_book_repository_mock
+        )
 
         yield
 
@@ -42,7 +49,9 @@ class TestListStatsBooksByCategoriesUseCaseImpl:
         books.append(ScrapeBookFaker.fake(category="03"))
         books.append(ScrapeBookFaker.fake(category="04"))
 
-        self._scrape_book_repository_mock.get_all_books_async.side_effect = lambda *args, **kwargs: books
+        self._scrape_book_repository_mock.get_all_books_async.side_effect = (
+            lambda *args, **kwargs: books
+        )
         self._use_case_output_mock.success.side_effect = None
 
         # act
@@ -50,4 +59,6 @@ class TestListStatsBooksByCategoriesUseCaseImpl:
 
         # assert
         self._scrape_book_repository_mock.get_all_books_async.assert_called_once()
-        self._use_case_output_mock.success.assert_called_once_with(books.get_stats_books_by_category())
+        self._use_case_output_mock.success.assert_called_once_with(
+            books.get_stats_books_by_category()
+        )

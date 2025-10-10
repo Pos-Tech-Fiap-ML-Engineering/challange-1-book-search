@@ -3,7 +3,9 @@ import json
 from src.api.presenters.base.BasePresenter import BasePresenter
 from fastapi.responses import JSONResponse, Response
 
-from src.application.boundaries.use_case.validator.UseCaseInputNotificationErrors import UseCaseInputNotificationErrors
+from src.application.boundaries.use_case.validator.UseCaseInputNotificationErrors import (
+    UseCaseInputNotificationErrors,
+)
 
 
 class TestBasePresenter:

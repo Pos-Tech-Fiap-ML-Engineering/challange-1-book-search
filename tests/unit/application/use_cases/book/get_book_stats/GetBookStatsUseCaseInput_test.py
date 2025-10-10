@@ -1,5 +1,7 @@
 from src.application.boundaries.use_case.input.UseCaseInput import UseCaseInput
-from src.application.use_cases.book.get_book_stats.GetBookStatsUseCaseInput import GetBookStatsUseCaseInput
+from src.application.use_cases.book.get_book_stats.GetBookStatsUseCaseInput import (
+    GetBookStatsUseCaseInput,
+)
 
 
 class TestGetBookStatsUseCaseInput:

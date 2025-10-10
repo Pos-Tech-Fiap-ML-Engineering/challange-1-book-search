@@ -1,15 +1,21 @@
-from typing import Iterator
+from collections.abc import Iterator
 from unittest.mock import Mock
 
 import pytest
 from pytest_mock import MockerFixture
 
 from src.application.boundaries.use_case.UseCase import UseCase
-from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseImpl import ListAllBooksUseCaseImpl
-from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseInput import ListAllBooksUseCaseInput
+from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseImpl import (
+    ListAllBooksUseCaseImpl,
+)
+from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseInput import (
+    ListAllBooksUseCaseInput,
+)
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
-from tests.assets.mocks.ListAllBooksUseCaseOutputHandlerMock import ListAllBooksUseCaseOutputHandlerMock
+from tests.assets.mocks.ListAllBooksUseCaseOutputHandlerMock import (
+    ListAllBooksUseCaseOutputHandlerMock,
+)
 from tests.assets.mocks.ScrapeBookRepositoryMock import ScrapeBookRepositoryMock
 
 
@@ -21,13 +27,15 @@ class TestListAllBooksUseCaseImpl:
 
     @pytest.fixture(autouse=True)
     def setup_teardown(
-            self,
-            mocker: MockerFixture,
+        self,
+        mocker: MockerFixture,
     ) -> Iterator[None]:
         self._scrape_book_repository_mock = ScrapeBookRepositoryMock.create(mocker)
         self._use_case_input = ListAllBooksUseCaseInput()
         self._use_case_output_mock = ListAllBooksUseCaseOutputHandlerMock.create(mocker)
-        self._use_case = ListAllBooksUseCaseImpl(scrape_book_repository=self._scrape_book_repository_mock)
+        self._use_case = ListAllBooksUseCaseImpl(
+            scrape_book_repository=self._scrape_book_repository_mock
+        )
 
         yield
 
@@ -38,7 +46,9 @@ class TestListAllBooksUseCaseImpl:
         books.append(ScrapeBookFaker.fake())
         books.append(ScrapeBookFaker.fake())
 
-        self._scrape_book_repository_mock.get_all_books_async.side_effect = lambda *args, **kwargs: books
+        self._scrape_book_repository_mock.get_all_books_async.side_effect = (
+            lambda *args, **kwargs: books
+        )
         self._use_case_output_mock.success.side_effect = None
 
         # act

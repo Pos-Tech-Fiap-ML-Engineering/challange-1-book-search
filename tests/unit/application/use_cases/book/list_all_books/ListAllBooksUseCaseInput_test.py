@@ -1,5 +1,7 @@
 from src.application.boundaries.use_case.input.UseCaseInput import UseCaseInput
-from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseInput import ListAllBooksUseCaseInput
+from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseInput import (
+    ListAllBooksUseCaseInput,
+)
 
 
 class TestListAllBooksUseCaseInput:

@@ -39,4 +39,3 @@ class BookOutput(BaseModel):
     @staticmethod
     def to_output_list_json(books: ScrapeBooks | list[ScrapeBook]) -> list[dict[str, Any]]:
         return [b.model_dump(mode="json") for b in BookOutput.to_output_list(books)]
-

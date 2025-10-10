@@ -1,5 +1,7 @@
 from src.application.boundaries.use_case.input.UseCaseInput import UseCaseInput
-from src.application.boundaries.use_case.validator.UseCaseInputNotificationErrors import UseCaseInputNotificationErrors
+from src.application.boundaries.use_case.validator.UseCaseInputNotificationErrors import (
+    UseCaseInputNotificationErrors,
+)
 
 
 class GetBookByIdUseCaseInput(UseCaseInput):

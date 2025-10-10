@@ -20,9 +20,8 @@ class TestBookStats:
         # act
         result = book_stats.to_dict()
 
-
         # assert
-        assert result ==  {
+        assert result == {
             "total_books": book_stats.total_books,
             "avg_price": book_stats.avg_price,
             "rating_distribution": book_stats.rating_distribution,

@@ -1,14 +1,20 @@
-from typing import Iterator
+from collections.abc import Iterator
 from unittest.mock import Mock
 
 import pytest
 from pytest_mock import MockerFixture
 
-from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseImpl import GetBookByIdUseCaseImpl
-from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseInput import GetBookByIdUseCaseInput
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseImpl import (
+    GetBookByIdUseCaseImpl,
+)
+from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseInput import (
+    GetBookByIdUseCaseInput,
+)
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
-from tests.assets.mocks.GetBookByIdUseCaseOutputHandlerMock import GetBookByIdUseCaseOutputHandlerMock
+from tests.assets.mocks.GetBookByIdUseCaseOutputHandlerMock import (
+    GetBookByIdUseCaseOutputHandlerMock,
+)
 from tests.assets.mocks.ScrapeBookRepositoryMock import ScrapeBookRepositoryMock
 
 
@@ -21,13 +27,15 @@ class TestGetBookByIdUseCaseImpl:
 
     @pytest.fixture(autouse=True)
     def setup_teardown(
-            self,
-            mocker: MockerFixture,
+        self,
+        mocker: MockerFixture,
     ) -> Iterator[None]:
         self._scrape_book_repository_mock = ScrapeBookRepositoryMock.create(mocker)
         self._use_case_input = GetBookByIdUseCaseInput(self._BOOK_ID)
         self._use_case_output_mock = GetBookByIdUseCaseOutputHandlerMock.create(mocker)
-        self._use_case = GetBookByIdUseCaseImpl(scrape_book_repository=self._scrape_book_repository_mock)
+        self._use_case = GetBookByIdUseCaseImpl(
+            scrape_book_repository=self._scrape_book_repository_mock
+        )
 
         yield
 
@@ -53,7 +61,9 @@ class TestGetBookByIdUseCaseImpl:
         books = ScrapeBooks()
         books.append(ScrapeBookFaker.fake(model_id=self._BOOK_ID))
 
-        self._scrape_book_repository_mock.get_all_books_async.side_effect = lambda *args, **kwargs: books
+        self._scrape_book_repository_mock.get_all_books_async.side_effect = (
+            lambda *args, **kwargs: books
+        )
         self._use_case_output_mock.success.side_effect = None
 
         # act
@@ -68,7 +78,9 @@ class TestGetBookByIdUseCaseImpl:
         books = ScrapeBooks()
         books.append(ScrapeBookFaker.fake(model_id=self._BOOK_ID + 2300))
 
-        self._scrape_book_repository_mock.get_all_books_async.side_effect = lambda *args, **kwargs: books
+        self._scrape_book_repository_mock.get_all_books_async.side_effect = (
+            lambda *args, **kwargs: books
+        )
         self._use_case_output_mock.not_found.side_effect = None
 
         # act
