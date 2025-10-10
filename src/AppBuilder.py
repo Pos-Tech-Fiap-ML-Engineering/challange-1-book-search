@@ -8,17 +8,27 @@ import logging
 from src.api.controllers.Router import Router
 from src.api.controllers.abstractions.BaseController import BaseController
 from src.api.controllers.v1.BooksController import BooksController
+from src.api.controllers.v1.CategoriesController import CategoriesController
 from src.api.controllers.v1.HealthController import HealthController
+from src.api.controllers.v1.StatsController import StatsController
 from src.application.boundaries.factory.HttpClientFactory import HttpClientFactory
 from src.application.boundaries.use_case.UseCaseManager import UseCaseManager
 from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseImpl import GetBookByIdUseCaseImpl
+from src.application.use_cases.book.get_book_stats.GetBookStatsUseCaseImpl import GetBookStatsUseCaseImpl
 from src.application.use_cases.book.list_all_books.ListAllBooksUseCaseImpl import ListAllBooksUseCaseImpl
+from src.application.use_cases.book.list_books_by_title_category.ListBooksByCategoryTitleUseCaseImpl import \
+    ListBooksByCategoryTitleUseCaseImpl
+from src.application.use_cases.book.list_top_rated_books.ListTopRatedBooksUseCaseImpl import \
+    ListTopRatedBooksUseCaseImpl
 from src.application.use_cases.book.scrape_books.ScrapeBooksUseCaseImpl import (
     ScrapeBooksUseCaseImpl,
 )
 from src.application.use_cases.book.scrape_books.ScrapeBooksUseCaseInput import (
     ScrapeBooksUseCaseInput,
 )
+from src.application.use_cases.category.list_categories.ListCategoriesUseCaseImpl import ListCategoriesUseCaseImpl
+from src.application.use_cases.category.list_stats_books_by_categories.ListStatsBooksByCategoriesUseCaseImpl import \
+    ListStatsBooksByCategoriesUseCaseImpl
 from src.domain.scrape_book.repository.ScrapeBookRepository import ScrapeBookRepository
 from src.infrastructure.application.boundaries.factory.HttpClientFactoryImpl import (
     HttpClientFactoryImpl,
@@ -76,6 +86,11 @@ class AppBuilder:
                     ),
                     ListAllBooksUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
                     GetBookByIdUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    ListBooksByCategoryTitleUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    ListCategoriesUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    GetBookStatsUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    ListStatsBooksByCategoriesUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
+                    ListTopRatedBooksUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
                 ],
             )
 
@@ -88,6 +103,8 @@ class AppBuilder:
                 self.V1_CONTROLLERS: [
                     HealthController(),
                     BooksController(self.use_caser_manager),
+                    CategoriesController(self.use_caser_manager),
+                    StatsController(self.use_caser_manager),
                 ]
             }
 
