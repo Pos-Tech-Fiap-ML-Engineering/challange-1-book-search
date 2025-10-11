@@ -1,0 +1,15 @@
+C4Component
+    title Book Search – Componentes do FastAPI Backend
+    Container_Boundary(api, "FastAPI Backend") {
+        Component(router, "Router & Controllers", "FastAPI Routers", "Mapeiam rotas (Books, Categories, Stats, Health) para casos de uso")
+        Component(presenters, "API Presenters", "Classes Async", "Traduzem resultados de casos de uso em respostas HTTP")
+        Component(useCaseManager, "UseCaseManagerImpl", "Orquestrador", "Resolve o caso de uso correto, valida entradas e trata erros")
+        Component(useCases, "Casos de Uso de Consulta", "List/Get UseCases", "Consultam livros, categorias e estatísticas a partir do repositório")
+        Component(repository, "ScrapeBookRepositoryImpl", "Repositório CSV", "Fornece acesso ao catálogo armazenado em arquivo")
+    }
+    Component_Ext(csvStore, "Catálogo CSV", "Arquivo CSV", "Dados persistidos de livros")
+
+    Rel(router, useCaseManager, "Envia comandos e parâmetros", "ExecuteAsync")
+    Rel(useCaseManager, useCases, "Localiza e executa", "Polimorfismo de casos de uso")
+    Rel(useCases, repository, "Lê livros e estatísticas", "Métodos assíncronos")
+    Rel(repository, csvStore, "Carrega dados do arquivo", "CSV I/O")

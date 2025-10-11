@@ -1,0 +1,14 @@
+C4Container
+    Person(user, "Usuário", "Explora o catálogo de livros")
+    System_Boundary(system, "Book Search") {
+        Container(api, "FastAPI Backend", "Python / FastAPI", "Expõe endpoints REST e orquestra casos de uso")
+        Container(worker, "Scraping Worker", "Python Async Task", "Executa o caso de uso de scraping para atualizar o catálogo")
+        ContainerDb(csvStore, "Catálogo CSV", "Arquivo CSV", "Armazena livros raspados e estatísticas derivadas")
+    }
+    System_Ext(scrapeSite, "Books to Scrape", "Site de e-commerce", "Origem dos dados de livros")
+
+    Rel(user, api, "Consulta /books, /categories, /stats", "HTTP/JSON")
+    Rel(api, csvStore, "Carrega livros e estatísticas", "Leitura de arquivo")
+    Rel(worker, csvStore, "Persiste livros raspados", "Escrita de arquivo")
+    Rel(worker, scrapeSite, "Raspa páginas e detalhes de livros", "HTTP")
+    Rel(worker, api, "Disponibiliza catálogo atualizado", "Dados compartilhados via repositório")

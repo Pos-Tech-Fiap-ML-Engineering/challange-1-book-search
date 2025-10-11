@@ -1,0 +1,18 @@
+C4Component
+    Container_Boundary(worker, "Scraping Worker") {
+        Component(cli, "Script ScrapeBooks", "CLI/Coroutine", "Dispara o caso de uso de scraping via AppBuilder.script_scrape_books")
+        Component(scrapeUseCase, "ScrapeBooksUseCaseImpl", "Caso de Uso", "Percorre páginas, extrai detalhes e coordena persistência")
+        Component(parser, "Parsing Helpers", "BeautifulSoup + Regras", "Interpreta HTML e converte para entidades ScrapeBook")
+        Component(repository, "ScrapeBookRepositoryImpl", "Repositório CSV", "Persiste o catálogo atualizado")
+        Component(httpClient, "Httpx Client", "Cliente HTTP", "Emite requisições com user-agent dinâmico")
+    }
+    Component_Ext(scrapeSite, "Books to Scrape", "Site de e-commerce", "Origem dos dados")
+    Component_Ext(csvStore, "Catálogo CSV", "Arquivo CSV", "Destino final dos dados raspados")
+
+    Rel(cli, scrapeUseCase, "Executa", "Async")
+    Rel(scrapeUseCase, httpClient, "Busca páginas e detalhes", "GET")
+    Rel(scrapeUseCase, parser, "Delegação", "Parsing do HTML")
+    Rel(parser, scrapeUseCase, "Retorna entidades ScrapeBook", "Objetos de domínio")
+    Rel(scrapeUseCase, repository, "Persistência", "save_books_async")
+    Rel(repository, csvStore, "Escreve catálogo", "CSV I/O")
+    Rel(httpClient, scrapeSite, "Requisições de scraping", "HTTP")

@@ -1,0 +1,26 @@
+sequenceDiagram
+    participant User as Cliente
+    participant API as FastAPI Controller
+    participant UCM as UseCaseManager
+    participant UC as Caso de Uso
+    participant Repo as ScrapeBookRepository
+    participant CSV as books.csv
+    participant Script as Script Scraper
+    participant Site as books.toscrape.com
+
+    User->>API: GET /api/v1/books
+    API->>UCM: execute_async(input, presenter)
+    UCM->>UC: executar caso de uso
+    UC->>Repo: get_all_books_async()
+    Repo->>CSV: ler catálogo
+    CSV-->>Repo: ScrapeBooks
+    Repo-->>UC: coleção de livros
+    UC-->>UCM: success(...)
+    UCM-->>API: presenter.result_async()
+    API-->>User: JSON 200
+
+    Script->>UCM: execute_async(ScrapeBooksUseCaseInput)
+    UCM->>UC: executar ScrapeBooksUseCase
+    UC->>Site: GET páginas e detalhes
+    UC->>Repo: save_books_async(lista)
+    Repo->>CSV: sobrescrever arquivo
