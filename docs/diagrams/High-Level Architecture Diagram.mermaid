@@ -1,0 +1,47 @@
+graph TD
+
+    subgraph "Interface"
+        User[[Consumer API]]
+        ScriptRunner[[Script Opeator]]
+    end
+    subgraph "API (src/api)"
+        FastAPI[FastAPI + Routers]
+        Presenters[Presenters HTTP]
+    end
+    subgraph "Application (src/application)"
+        UCM[UseCaseManagerImpl]
+        UC[Use Cases]
+    end
+    subgraph "Domain (src/domain)"
+        Entities[ScrapeBook / ScrapeBooks]
+        VOs[Money
+            Rating
+            BookStats
+            Upc]
+    end
+    subgraph "Infrastructure (src/infrastructure)"
+        Repo[ScrapeBookRepositoryImpl CSV]
+        HTTP[HttpClientFactoryImpl httpx]
+        Logger[AppLoggerImpl
+               SetupAppLogger]
+    end
+    subgraph "Data"
+        CSV[(src/data/books.csv)]
+    end
+    subgraph "WebSite"
+        External([books.toscrape.com])
+    end
+
+    Entities --> VOs
+    User -->|HTTP /api/v1| FastAPI
+    FastAPI --> Presenters
+    Presenters --> UCM
+    UCM --> UC
+    UC --> Repo
+    UC --> Entities
+    Repo --> CSV
+    UC --> HTTP
+    HTTP --> External
+    UCM --> Logger
+    ScriptRunner -->|async| UCM
+

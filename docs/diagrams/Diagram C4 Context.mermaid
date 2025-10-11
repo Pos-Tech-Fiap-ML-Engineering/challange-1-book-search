@@ -1,0 +1,10 @@
+C4Context
+    Person(user, "Consumidor de Livros", "Usuário que consulta títulos, categorias e estatísticas pela API.")
+    System_Boundary(book_search, "Sistema Book Search") {
+        System(api, "API Book Search", "FastAPI", "Fornece endpoints REST para consultar livros, categorias e estatísticas.")
+        SystemDb(csv_store, "books.csv", "Arquivo CSV", "Armazena os dados raspados localmente.")
+    }
+    Rel(user, api, "Consulta dados e estatísticas")
+    Rel(api, csv_store, "Lê dados armazenados")
+    Rel(api, books_site, "Obtém catálogo via raspagem (script interno)", "HTTP")
+    System_Ext(books_site, "Books to Scrape", "Website externo", "Catálogo público de livros utilizado como fonte de dados.")
