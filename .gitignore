@@ -218,3 +218,6 @@ override.tf
 override.tf.json
 terraform.rc
 *.tfvars.secret
+
+# newrelic
+newrelic.ini

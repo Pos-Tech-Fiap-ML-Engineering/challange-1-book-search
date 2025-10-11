@@ -12,6 +12,7 @@ from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseInput impor
 )
 from src.domain.scrape_book.ScrapeBooks import ScrapeBooks
 from tests.assets.fakers.ScrapeBookFaker import ScrapeBookFaker
+from tests.assets.mocks.AppLoggerMock import AppLoggerMock
 from tests.assets.mocks.GetBookByIdUseCaseOutputHandlerMock import (
     GetBookByIdUseCaseOutputHandlerMock,
 )
@@ -21,20 +22,23 @@ from tests.assets.mocks.ScrapeBookRepositoryMock import ScrapeBookRepositoryMock
 class TestGetBookByIdUseCaseImpl:
     _BOOK_ID: int = 10
     _scrape_book_repository_mock: Mock
+    _logger_mock: Mock
     _use_case_input: GetBookByIdUseCaseInput
     _use_case_output_mock: Mock
     _use_case: GetBookByIdUseCaseImpl
 
     @pytest.fixture(autouse=True)
     def setup_teardown(
-        self,
-        mocker: MockerFixture,
+            self,
+            mocker: MockerFixture,
     ) -> Iterator[None]:
         self._scrape_book_repository_mock = ScrapeBookRepositoryMock.create(mocker)
+        self._logger_mock = AppLoggerMock.create(mocker)
         self._use_case_input = GetBookByIdUseCaseInput(self._BOOK_ID)
         self._use_case_output_mock = GetBookByIdUseCaseOutputHandlerMock.create(mocker)
         self._use_case = GetBookByIdUseCaseImpl(
-            scrape_book_repository=self._scrape_book_repository_mock
+            scrape_book_repository=self._scrape_book_repository_mock,
+            logger=self._logger_mock
         )
 
         yield
@@ -66,12 +70,27 @@ class TestGetBookByIdUseCaseImpl:
         )
         self._use_case_output_mock.success.side_effect = None
 
+        self._logger_mock.info.side_effect = None
+
         # act
         await self._use_case.execute_async(self._use_case_input, self._use_case_output_mock)
 
         # assert
         self._scrape_book_repository_mock.get_all_books_async.assert_called_once()
         self._use_case_output_mock.success.assert_called_once_with(books[0])
+        called_args, called_kwargs = self._logger_mock.info.call_args_list
+        assert(len(called_args) == 2)
+        assert(len(called_kwargs) == 2)
+        assert called_args[0][0] == f'Recovery Book id: {str(books[0].id)}'
+        assert called_args[1] == {}
+        assert called_kwargs[0][0] == 'Book Info in log attributes'
+        assert called_kwargs[0][1] == {
+                "id": str(books[0].id),
+                "category": str(books[0].category),
+                "title": str(books[0].title),
+                "price_full": str(books[0].price_full),
+            }
+        assert called_kwargs[1] == {}
 
     async def test_execute_async_and_return_not_found(self) -> None:
         # arrange
@@ -83,9 +102,15 @@ class TestGetBookByIdUseCaseImpl:
         )
         self._use_case_output_mock.not_found.side_effect = None
 
+        self._logger_mock.info.side_effect = None
+
         # act
         await self._use_case.execute_async(self._use_case_input, self._use_case_output_mock)
 
         # assert
         self._scrape_book_repository_mock.get_all_books_async.assert_called_once()
         self._use_case_output_mock.not_found.assert_called_once()
+        called_args = self._logger_mock.info.call_args_list
+        assert (len(called_args) == 1)
+        assert called_args[0][0][0] == 'Recovery Book id: None'
+        assert called_args[0][1] == {}

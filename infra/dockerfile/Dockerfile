@@ -29,6 +29,9 @@ RUN poetry config virtualenvs.create false \
 
 RUN poetry run poe export_requirements_prod
 
+RUN grep -E '^newrelic([=<>]|$)' requirements.txt >/dev/null \
+  || (echo 'ERRO: newrelic não foi exportado para requirements.txt' >&2; exit 1)
+
 COPY ./src/ ./src/
 
 # =========================
@@ -51,6 +54,7 @@ USER fastapiuser
 WORKDIR /app
 
 COPY --from=builder /app /app
+COPY --chown=fastapiuser:fastapiuser newrelic.ini /app/newrelic.ini
 
 EXPOSE 8000
 
@@ -65,7 +69,9 @@ RUN pip install --no-cache-dir -r requirements.txt \
 USER fastapiuser
 
 CMD ["/bin/sh", "-c", "\
-  exec gunicorn -k uvicorn.workers.UvicornWorker src.api.Main:app \
+  NEW_RELIC_CONFIG_FILE=/app/newrelic.ini \
+  exec newrelic-admin run-program \
+  gunicorn -k uvicorn.workers.UvicornWorker src.api.Main:app \
   -w \"$GUNICORN_WORKERS\" -b 0.0.0.0:8000 \
   --access-logfile - --error-logfile - \
   --keep-alive 5 --timeout 30 \

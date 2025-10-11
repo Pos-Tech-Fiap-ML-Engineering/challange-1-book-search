@@ -15,6 +15,12 @@ else
   RED='' ; YELLOW='' ; RESET=''
 fi
 
+epoch_ts() {
+  date -u +%s 2>/dev/null || python3 - <<'PY'
+import time; print(int(time.time()))
+PY
+}
+
 # Logging
 log()       { printf "%s - %s\n" "$(date '+%F %T')" "$*"; }
 log_warn()  { printf "${YELLOW}%s - %s${RESET}\n" "$(date '+%F %T')" "$*" >&2; }
@@ -47,7 +53,8 @@ load_default_configs(){
   export ECS_SERVICE="$(infra_get_output "ecs_service_name")" || die "Falha ao ler output 'ecs_service_name' do Terraform"
   export ECS_DESIRED_ON_DEPLOY=2
   export GIT_SHA="$(git rev-parse --short=12 HEAD 2>/dev/null || echo 'local')"
-  export IMAGE_TAG="${GIT_SHA:-latest}"
+#  export IMAGE_TAG="${GIT_SHA:-latest}"
+  export IMAGE_TAG="$(epoch_ts)"
   export DOCKER_IMAGE_NAME="${ECR_REPOSITORY_URL}:${IMAGE_TAG}"
 #  export DOCKER_IMAGE_NAME="${ECR_REPOSITORY_URL}:latest"
 
