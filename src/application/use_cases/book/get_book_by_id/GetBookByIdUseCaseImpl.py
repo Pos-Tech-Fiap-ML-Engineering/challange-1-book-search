@@ -10,6 +10,7 @@ from src.application.use_cases.book.get_book_by_id.GetBookByIdUseCaseOutputHandl
     GetBookByIdUseCaseOutputHandler,
 )
 from src.domain.scrape_book.repository.ScrapeBookRepository import ScrapeBookRepository
+from src.standard.app_log.AppLogger import AppLogger
 
 
 class GetBookByIdUseCaseImpl(
@@ -18,8 +19,11 @@ class GetBookByIdUseCaseImpl(
 ):
     input_type: type[GetBookByIdUseCaseInput] = GetBookByIdUseCaseInput
 
-    def __init__(self, scrape_book_repository: ScrapeBookRepository) -> None:
+    def __init__(self, scrape_book_repository: ScrapeBookRepository,
+                 logger: AppLogger) -> None:
         self._scrape_book_repository = scrape_book_repository
+        self._logger = logger
+
 
     async def impl_validate_async(
         self,
@@ -36,7 +40,15 @@ class GetBookByIdUseCaseImpl(
         books = await self._scrape_book_repository.get_all_books_async()
         book = books.get_by_id(use_case_input.id)
 
+        self._logger.info(f"Recovery Book id: {book.id if book else None}", )
+
         if book:
+            self._logger.info(f"Book Info in log attributes", {
+                "id": str(book.id),
+                "category": str(book.category),
+                "title": str(book.title),
+                "price_full": str(book.price_full),
+            })
             use_case_output.success(book)
         else:
             use_case_output.not_found()

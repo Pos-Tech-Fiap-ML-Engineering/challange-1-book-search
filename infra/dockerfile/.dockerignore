@@ -11,4 +11,5 @@ requirements*.txt
 *.pyc
 .venv
 .poetry
+!newrelic.ini
 
