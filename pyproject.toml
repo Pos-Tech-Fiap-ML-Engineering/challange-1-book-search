@@ -47,8 +47,6 @@ package-mode = false
 # -----------------------------
 # Black = "o Prettier do Python"
 # -----------------------------
-
-
 [tool.black]
 line-length = 100
 target-version = ["py312"]
@@ -140,8 +138,8 @@ pretty = true
 #ignore = ["DEP002", "DEP003"] # Você pode desligar a regra toda
 
 [tool.deptry.per_rule_ignores]
-DEP002 = ["uvicorn"]   # ignorar "unused dependency" só para uvicorn
-DEP003 = ["pydantic"]  # ignorar "transitive dependency" só para pydantic
+DEP002 = ["uvicorn", "newrelic"]   # ignorar "unused dependency"
+DEP003 = ["pydantic"]  # ignorar "transitive dependency"
 
 
 

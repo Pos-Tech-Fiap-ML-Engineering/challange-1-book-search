@@ -101,8 +101,9 @@ class AppBuilder:
                         scrape_book_repository=self.scrape_book_repository,
                     ),
                     ListAllBooksUseCaseImpl(scrape_book_repository=self.scrape_book_repository),
-                    GetBookByIdUseCaseImpl(scrape_book_repository=self.scrape_book_repository,
-                                           logger=self.app_logger),
+                    GetBookByIdUseCaseImpl(
+                        scrape_book_repository=self.scrape_book_repository, logger=self.app_logger
+                    ),
                     ListBooksByCategoryTitleUseCaseImpl(
                         scrape_book_repository=self.scrape_book_repository
                     ),
@@ -168,13 +169,13 @@ class AppBuilder:
         return _run
 
     def override_instances(
-            self,
-            param_app_logger: AppLogger | None = None,
-            param_http_client_factory: HttpClientFactory | None = None,
-            param_scrape_book_repository: ScrapeBookRepository | None = None,
-            param_use_caser_manager: UseCaseManager | None = None,
-            param_controllers: dict[str, list[BaseController]] | None = None,
-            param_fast_api: FastAPI | None = None,
+        self,
+        param_app_logger: AppLogger | None = None,
+        param_http_client_factory: HttpClientFactory | None = None,
+        param_scrape_book_repository: ScrapeBookRepository | None = None,
+        param_use_caser_manager: UseCaseManager | None = None,
+        param_controllers: dict[str, list[BaseController]] | None = None,
+        param_fast_api: FastAPI | None = None,
     ) -> None:
         self._app_logger = param_app_logger or self.app_logger
         self._http_client_factory = param_http_client_factory or self.http_client_factory

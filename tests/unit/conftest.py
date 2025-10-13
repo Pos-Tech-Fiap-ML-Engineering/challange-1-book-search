@@ -6,7 +6,8 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from src.domain.scrape_book.ScrapeBook import ScrapeBook
 
-@pytest.fixture(scope="function",autouse=True)
+
+@pytest.fixture(scope="function", autouse=True)
 def _reset_logging() -> Iterator[None]:
 
     yield
@@ -19,6 +20,7 @@ def _reset_logging() -> Iterator[None]:
         logger.handlers.clear()
         logger.setLevel(logging.NOTSET)
         logger.propagate = True
+
 
 @pytest.fixture(scope="function", autouse=True)
 def _global_setup_teardown(monkeypatch: MonkeyPatch) -> Iterator[None]:

@@ -29,16 +29,15 @@ class TestGetBookByIdUseCaseImpl:
 
     @pytest.fixture(autouse=True)
     def setup_teardown(
-            self,
-            mocker: MockerFixture,
+        self,
+        mocker: MockerFixture,
     ) -> Iterator[None]:
         self._scrape_book_repository_mock = ScrapeBookRepositoryMock.create(mocker)
         self._logger_mock = AppLoggerMock.create(mocker)
         self._use_case_input = GetBookByIdUseCaseInput(self._BOOK_ID)
         self._use_case_output_mock = GetBookByIdUseCaseOutputHandlerMock.create(mocker)
         self._use_case = GetBookByIdUseCaseImpl(
-            scrape_book_repository=self._scrape_book_repository_mock,
-            logger=self._logger_mock
+            scrape_book_repository=self._scrape_book_repository_mock, logger=self._logger_mock
         )
 
         yield
@@ -79,18 +78,15 @@ class TestGetBookByIdUseCaseImpl:
         self._scrape_book_repository_mock.get_all_books_async.assert_called_once()
         self._use_case_output_mock.success.assert_called_once_with(books[0])
         called_args, called_kwargs = self._logger_mock.info.call_args_list
-        assert(len(called_args) == 2)
-        assert(len(called_kwargs) == 2)
-        assert called_args[0][0] == f'Recovery Book id: {str(books[0].id)}'
+        assert len(called_args) == 2
+        assert len(called_kwargs) == 2
+        assert called_args[0][0] == f"Recovery Book id: {str(books[0].id)}"
         assert called_args[1] == {}
-        assert called_kwargs[0][0] == 'Book Info in log attributes'
-        assert called_kwargs[0][1] == {
-                "id": str(books[0].id),
-                "category": str(books[0].category),
-                "title": str(books[0].title),
-                "price_full": str(books[0].price_full),
-            }
-        assert called_kwargs[1] == {}
+        assert called_kwargs[0] == ()
+        assert called_kwargs[1] == {
+            "extra": {"category": "Technology", "id": "10", "price_full": "57", "title": "Him."},
+            "message": "Book Info in log attributes",
+        }
 
     async def test_execute_async_and_return_not_found(self) -> None:
         # arrange
@@ -111,6 +107,6 @@ class TestGetBookByIdUseCaseImpl:
         self._scrape_book_repository_mock.get_all_books_async.assert_called_once()
         self._use_case_output_mock.not_found.assert_called_once()
         called_args = self._logger_mock.info.call_args_list
-        assert (len(called_args) == 1)
-        assert called_args[0][0][0] == 'Recovery Book id: None'
+        assert len(called_args) == 1
+        assert called_args[0][0][0] == "Recovery Book id: None"
         assert called_args[0][1] == {}

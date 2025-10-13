@@ -12,7 +12,9 @@ clientes HTTP e infraestrutura de logging necessários para executar o domínio 
   - [Diagrama de sequência das rotas e do script](#diagrama-de-sequência-das-rotas-e-do-script)
   - [Diagrama C4 do projeto](#diagrama-c4-do-projeto)
 - [Endpoints](#endpoints)
-- [ Pipeline de scraping e dados](#pipeline-de-scraping-e-dados)
+- [Pipeline de scraping e dados](#pipeline-de-scraping-e-dados)
+- [Reproduzir o ambiente](#-reproduzir-o-ambiente)
+- [Futuras melhorias](#-futuras-melhorias)
 
 ---
 
@@ -21,6 +23,17 @@ clientes HTTP e infraestrutura de logging necessários para executar o domínio 
   - [Health Check](http://aws-cloud-challange-dev-alb-402052449.us-east-1.elb.amazonaws.com/api/v1/health)
   - [Swagger](http://aws-cloud-challange-dev-alb-402052449.us-east-1.elb.amazonaws.com/docs)
   - [Redoc](http://aws-cloud-challange-dev-alb-402052449.us-east-1.elb.amazonaws.com/redoc) <br><br>
+
+- **Link vídeo de apresentação do projeto** <br><br>
+  - [Link: Apresentação](https://1drv.ms/v/c/2f86df080e3673b3/EbGsD_4Ay-NBnxluDag35VsBIibzVvzaYFW1HdpFqVir7A?e=QausEk)
+    - A visualização direta pelo link está com uma qualidade inferior, favor realizar a download da apresentação através:
+    - ![download_apresentaacao.png](docs/imgs/download_apresentaacao.png)
+
+- **Link acesso newrelic Instrumentação/Logs aplicação em produção**:
+  - [Link: NewRelic](https://1drv.ms/t/c/2f86df080e3673b3/Edk3x9aLlkVLjxonTRV53B0BMj18vbXuYnOZ3fpSBQZm2w?e=8Ub7Ag)<br><br>
+
+- **Link acesso console aws**:
+  - [Link: Aws-Console](https://1drv.ms/t/c/2f86df080e3673b3/ESBt-uIm4JJCryCEKT-flEsBSTGzqA8px7Y8uFkDgv5Q3g?e=LgcbqX)<br><br>
    
 - API REST full-stack: Controllers FastAPI versionados em /api/v1 atendem consultas de saúde, livros, categorias e estatísticas 
   com respostas tipadas por esquemas Pydantic. <br><br>
@@ -196,5 +209,19 @@ gerados localmente. <br>
 - Observabilidade:
   - Verifique o serviço no New Relic APM com o nome configurado (NEW_RELIC_APP_NAME).
   - Consulte logs e métricas de container/APP (NR Logs e NR Metrics/Infra).
+
+---
+
+## 🔮 Futuras melhorias
+- **Autenticação e autorização**: implementar fluxo de login com emissão de tokens JWT para proteger rotas sensíveis, 
+  permitindo papéis distintos (admin, leitor) e expiração/refresh automatizados.
+- **Endpoints de machine learning**: disponibilizar as rotas de ML previstas no escopo original, integrando modelos de 
+  recomendação ou classificação para enriquecer a experiência de busca.
+- **Pipeline de CI/CD gerenciado**: migrar o `script.sh` para uma ferramenta como GitHub Actions ou GitLab CI, 
+  garantindo execução automática dos jobs de qualidade, build e deploy a cada push em branches principais.
+- **DNS amigável**: provisionar um domínio gerenciado via Route53 apontando para o Load Balancer, com certificados TLS 
+  válidos (ACM) e redirecionamento HTTPS forçado.
+- **Observabilidade e custo**: configurar alertas proativos (CloudWatch, New Relic) para erro/latência e revisar políticas 
+  de autoscaling para evitar sobrecusto e melhorar resiliência.
 
 ---

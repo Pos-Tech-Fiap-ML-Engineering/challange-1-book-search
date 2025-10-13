@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Any
+from typing import Any
 
 import pytest
 
@@ -9,11 +9,11 @@ from src.infrastructure.standard.app_log.filters.DropLoggingFilter import DropLo
 
 
 def make_record(
-    msg: Optional[str],
+    msg: str | None,
     *,
     level: int = logging.INFO,
-    path: Optional[str] = None,
-    user_agent: Optional[Any] = None,
+    path: str | None = None,
+    user_agent: Any | None = None,
     name: str = "test",
     pathname: str = __file__,
     lineno: int = 1,
